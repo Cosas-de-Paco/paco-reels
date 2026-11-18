@@ -1,0 +1,197 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>@font-face{font-family:"Fredoka";src:url("Fredoka.ttf")}html,body{margin:0;padding:0;background:#000}canvas{display:block}</style>
+</head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="common.js"></script><script src="hd.js"></script><script src="fx.js"></script><script src="body2.js"></script><script src="cel.js"></script><script src="props14.js"></script><script src="lib.js"></script><script src="arms.js"></script><script src="anim.js"></script><script src="p20.js"></script>
+<script>
+// Reel 20: La guerra del termostato
+const T = { war: 9, lock: 21, peas: 30, end: 46 };
+const COLD = { top: '#BFE0FF', bot: '#4A6FD0', a: 0.3 }, WARM = { top: '#FFC27A', bot: '#E8473A', a: 0.3 };
+const OPT = o => Object.assign({ dof: 3, grade: COLD, rim: { col: '#FFFFFF', a: 0.5 }, bloom: 0.2, vig: 0.35 }, o);
+const ABU = { skin: STYLES.abuela.skin, sleeve: '#9B6FB8' }, PAC = { skin: SK, sleeve: '#2E8B7A' };
+const TH = { x: 700, y: 990, s: 0.55 }; // thermostat in the wide shot
+
+window.draw = function (t) {
+  if (t < T.war) sFirst(t);
+  else if (t < T.lock) sWar(t);
+  else if (t < T.peas) sLock(t);
+  else sPeas(t);
+  ctx = MAINCTX; ctx.setTransform(1, 0, 0, 1, 0, 0);
+  caption2('Noviembre.\nCalefacción a *24°*', t, 2.8, 5.6);
+  caption2('Paco: *19°.*\nNi uno más.', t, 6.3, 8.8);
+  caption2('La abuela\nno opina igual', t, 9.4, 12.2);
+  badge(t, 'Ronda ' + Math.min(9, 2 + Math.floor((t - 13.4) / 0.62)), 13.4, 17.0, 540, 470);
+  caption2('Esto es\nla *guerra.*', t, 17.4, 20.8);
+  caption2('Solución\n*definitiva*', t, 21.6, 25.0);
+  caption2('19° para siempre.\nLlave en el bolsillo.', t, 26.0, 29.8);
+  caption2('La abuela\nno discute…', t, 30.4, 33.6);
+  caption2('El termostato\ncree que hace *12°*', t, 35.5, 38.0);
+  caption2('…y pone la caldera\na *tope*', t, 38.2, 41.4, 270, '#FF8A4A');
+  caption2('¿A cuántos grados\ntenéis la casa?', t, 42.6, 45.8);
+  titleCard(t, 0.25, 2.5, 'La guerra', 'del termostato', '#7AD0FF');
+  grain(t, 0.045);
+  irisIn(t, 0, 0.6);
+  irisOut(t, T.end - 0.5, 0.5);
+  for (const c of [T.war, T.lock, T.peas, 35, 38.2]) whip(t, c);
+  for (let k = 0; k < 6; k++) whip(t, 13.4 + k * 0.62, 0.12);
+};
+// close-up of the thermostat. who: 'paco' | 'abu' | null, p: reach 0..1, press sign
+function thermoCU(t, temp, who, p, sign, extra = {}) {
+  setCam({ x: 540, y: 1000, z: 1.0 });
+  compose(t, OPT(Object.assign({
+    bg: () => { wall(extra.hot ? '#F7C99A' : '#CFE0D8', 2200); },
+    dof: 0,
+    ch: tt => {
+      thermostat(540, 980, 1.9, temp, { press: p > 0.95 ? sign : null, locked: extra.locked, lockSwing: extra.swing, bag: extra.bag, flame: extra.flame });
+      if (who) { const right = who === 'paco', c = right ? PAC : ABU;
+        const bx = 540 + (sign === '+' ? 60 : -60) * 1.9, by = 980 + 80 * 1.9 + (p > 0.95 ? 10 : 0);
+        const sh = right ? [960, 1900] : [120, 1900];
+        const hx = lerp(sh[0] - (right ? 120 : -120), bx + (right ? 40 : -40), p), hy = lerp(2250, by + 40, p);
+        hdArm(sh, [hx, hy], right ? 1 : -1, { k: 2.4, sleeve: c.sleeve, skin: c.skin, pose: 'point', side: right ? 1 : -1, cuff: right });
+      }
+      if (extra.after) extra.after(tt);
+    },
+    rim: { col: '#FFFFFF', a: 0.35 },
+    over: extra.over,
+    grade: extra.hot ? WARM : COLD,
+  }, extra.opt || {})));
+}
+// ---------- 1. first press: 24 -> 19
+function sFirst(t) {
+  const reach = seg(t, 3.4, 4.6), back = seg(t, 7.6, 8.6);
+  const temp = t < 4.7 ? 24 : Math.max(19, 24 - Math.floor((t - 4.7) / 0.32) - 1);
+  const pressing = t > 4.6 && t < 6.5 && ((t - 4.6) % 0.32) < 0.18;
+  thermoCU(t, temp, 'paco', reach * (1 - back) * (pressing ? 1 : 0.94), '–', {
+    over: tt => { if (t > 6.4 && t < 8.6) sparkles(tt, 540, 860, 5, 220); boom('¡BIP!', 820, 700, 90, '#FFFFFF', '#3FA7A0', t, 4.7, 0.1, 0.5); boom('¡BIP!', 280, 760, 90, '#FFFFFF', '#3FA7A0', t, 5.4, -0.1, 0.5); boom('¡BIP!', 800, 820, 90, '#FFFFFF', '#3FA7A0', t, 6.0, 0.08, 0.5); },
+  });
+}
+// ---------- 2. the war
+function abuela(o) { return person(Object.assign({ who: 'abuela', outfit: 'abuela' }, o)); }
+function abuWrapped(o, hand) { // abuela under a blanket; hand: absolute point or null
+  abuela(Object.assign({ handL: [-60, -330], handR: [60, -330] }, o));
+  const s = o.s || 1; manta(o.x, o.y - 30 * s, 470 * s, 560 * s, '#E8798F', o.t);
+  if (hand) { ctx.save(); ctx.translate(o.x, o.y); ctx.scale(s, s); const [lx, ly] = loc(o, hand[0], hand[1]); hdArm([110, -500], [lx, ly], 1, { k: 1, sleeve: '#E8798F', skin: ABU.skin, pose: hand[2] || 'point', side: 1 }); ctx.restore(); }
+  if (o.shiver) { ctx.save(); ctx.globalAlpha = 0.8; motionArcs(o.x - 200 * s, o.y - 700 * s, 60, 2.4, 3.6, 0.7); motionArcs(o.x + 200 * s, o.y - 700 * s, 60, -0.6, 0.6, 0.7); ctx.restore(); }
+}
+function sWar(t) {
+  const lt = t - T.war;
+  if (lt >= 4.4 && lt < 8.0) { // fast cuts on the thermostat
+    const k = Math.floor((lt - 4.4) / 0.62), ph = ((lt - 4.4) % 0.62) / 0.62, who = k % 2 ? 'paco' : 'abu';
+    const temp = who === 'abu' ? (ph > 0.5 ? 24 : 19) : (ph > 0.5 ? 19 : 24);
+    thermoCU(t, temp, who, Math.min(1, ph * 2.2), who === 'abu' ? '+' : '–', { opt: { dof: 0 } });
+    return;
+  }
+  setCam(lt < 4.4 ? camLerp({ x: 540, y: 1150, z: 1.0 }, { x: 600, y: 1150, z: 1.05 }, seg(lt, 0, 4)) : camLerp({ x: 680, y: 1150, z: 1.05 }, { x: 680, y: 1120, z: 1.18 }, seg(lt, 8, 12)));
+  const temp = lt < 2.0 ? 19 : lt < 3.4 ? Math.min(24, 19 + Math.floor((lt - 2.0) / 0.2)) : lt < 4.4 ? Math.max(19, 24 - Math.floor((lt - 3.4) / 0.15)) : 21;
+  compose(t, OPT({
+    bg: () => { livingBG(0); radiator(300, 1460, 0.8, 0, t); },
+    ch: tt => {
+      sofa(360, 1660, 0.75, '#5B7FD0');
+      thermostat(TH.x, TH.y, TH.s, temp, {});
+      if (lt < 8) {
+        // abuela shuffles in from the left and presses +
+        const ax = lerp(-250, 440, easeOut(prog(lt, 0, 1.8))), wc = walkCycle(tt, 10, 18, 0.6);
+        const reachA = lt > 1.7 && lt < 3.6;
+        abuWrapped({ x: ax, y: 1700, s: 0.78, t: tt, footL: lt < 1.8 ? wc.footL : undefined, footR: lt < 1.8 ? wc.footR : undefined, face: { mouth: lt > 2.0 ? 'smirk' : 'flat', eyes: lt > 2.0 ? 'half' : 'open', look: [1, -0.4], brow: { angry: lt > 3.4 ? 0.6 : 0 } } }, reachA ? [TH.x + 25, TH.y + 34] : null);
+        // Paco comes back from the right and presses -
+        const px = lerp(1350, 930, easeOut(prog(lt, 2.8, 3.4)));
+        if (lt > 2.8) paco({ outfit: 'pacoCasa', x: px, y: 1700, s: 0.82, t: tt, handL: lt > 3.3 ? loc({ x: px, y: 1700, s: 0.82 }, TH.x - 25, TH.y + 34) : [-180, -300], poseL: 'point', face: { mouth: 'frown', eyes: 'open', brow: { angry: 0.8 }, look: [-1, 0] } });
+      } else {
+        // standoff: both fingers on the buttons, sparks between the eyes
+        const a = tt * 30;
+        abuWrapped({ x: 440, y: 1700, s: 0.78, t: tt, face: { mouth: 'flat', eyes: 'half', look: [1, -0.2], brow: { angry: 1 } } }, [TH.x + 25 + wv(a, 1, 3), TH.y + 34]);
+        paco({ outfit: 'pacoCasa', x: 930, y: 1700, s: 0.82, t: tt, handL: loc({ x: 930, y: 1700, s: 0.82 }, TH.x - 25 + wv(a, 1.3, 3), TH.y + 34), poseL: 'point', handR: [170, -300], face: { mouth: 'flat', eyes: 'half', look: [-1, 0], brow: { angry: 1 }, vein: 1, t: tt } });
+      }
+    },
+    over: tt => {
+      if (lt > 2.0 && lt < 3.3) boom('¡BIP BIP!', 560, 780, 80, '#FFFFFF', '#E8473A', t, T.war + 2.0, -0.08, 1.2);
+      if (lt > 3.4 && lt < 4.4) boom('¡BIP BIP!', 860, 780, 80, '#FFFFFF', '#3FA7A0', t, T.war + 3.4, 0.08, 1.0);
+      if (lt > 8) { // eye lightning
+        const [ax, ay] = headPos({ x: 440, y: 1700, s: 0.78 }), [px, py] = headPos({ x: 930, y: 1700, s: 0.82 });
+        ctx.save(); ctx.strokeStyle = '#FFE14D'; ctx.lineWidth = 9; ctx.shadowColor = '#FFE14D'; ctx.shadowBlur = 20; ctx.beginPath();
+        const n = 7; for (let i = 0; i <= n; i++) { const p = i / n, jx = lerp(ax + 60, px - 60, p), jy = lerp(ay - 20, py - 20, p) + (i % 2 ? -1 : 1) * 26 * Math.sin(tt * 40 + i); i ? ctx.lineTo(jx, jy) : ctx.moveTo(jx, jy); } ctx.stroke(); ctx.restore();
+        shockBurst(690, 1000, 300, tt, '#FFE14D', 0.25);
+      }
+    },
+    grade: COLD,
+  }));
+}
+// ---------- 3. tape and padlock
+function sLock(t) {
+  const lt = t - T.lock;
+  if (lt < 4.6) {
+    const tape = seg(lt, 0.3, 2.6), lockOn = lt > 3.0;
+    thermoCU(t, 19, null, 0, null, { locked: Math.max(0.01, tape * 0.89 + (lockOn ? 0.11 : 0)), swing: lockOn ? Math.sin((lt - 3.0) * 9) * 0.3 * Math.exp(-(lt - 3.0) * 2) : 0,
+      after: tt => { if (lt < 2.8) { // tape roll moving around
+        const a = lt * 6; tapeRoll(540 + Math.cos(a) * 260, 1000 + Math.sin(a) * 140, 1.3); }
+        if (lt > 2.6 && lt < 3.2) { const p = seg(lt, 2.6, 3.0); padlock(610, lerp(1500, 1360, p), 2.1, 0); } },
+      over: tt => { boom('¡RRRAS!', 800, 680, 90, '#FFFFFF', '#8A8E9A', t, T.lock + 0.6, 0.1, 1.0); boom('¡CLIC!', 300, 1420, 110, '#FFFFFF', '#F2C23A', t, T.lock + 3.0, -0.1, 1.2); } });
+    return;
+  }
+  // wide: Paco smug with the key, abuela shivering
+  setCam(camLerp({ x: 540, y: 1150, z: 1.0 }, { x: 520, y: 1180, z: 1.12 }, seg(lt, 4.6, 9)));
+  compose(t, OPT({
+    bg: () => { livingBG(0); radiator(300, 1460, 0.8, 0, t); },
+    ch: tt => {
+      sofa(420, 1680, 0.9, '#5B7FD0');
+      thermostat(TH.x, TH.y, TH.s, 19, { locked: 1 });
+      abuWrapped({ x: 220, y: 1600, s: 0.72, t: tt, shiver: 1, face: { mouth: 'wobble', eyes: 'teary', look: [1, -0.2], brow: { raise: 0.4 }, t: tt } });
+      const kiss = lt > 5.0 && lt < 6.4;
+      paco({ outfit: 'pacoCasa', x: 640, y: 1640, s: 0.8, t: tt, footL: [-120, -60], footR: [80, -60],
+        handR: kiss ? [60, -720] : [250, -760], poseR: 'grab', holdR: (hx, hy) => smallKey(hx + 8, hy - 30, 1.2, -1.2 + Math.sin(tt * 3) * 0.2), handL: [-170, -330],
+        face: { mouth: kiss ? 'o' : 'smirk', eyes: kiss ? 'closed' : 'half', look: [0.6, -0.6], brow: { raise: 0.6 } } });
+    },
+    over: tt => { if (lt > 5.0 && lt < 6.4) heartsPop(740, 1000, tt, T.lock + 5.0, 3); ctx.save(); ctx.globalAlpha = 0.6; ctx.fillStyle = '#FFFFFF'; for (let i = 0; i < 25; i++) { const p = (tt * 0.15 + hash(i)) % 1; ell(hash(i + 5) * 1080, p * 1800, 6, 6); ctx.fill(); } ctx.restore(); },
+  }));
+}
+// ---------- 4. frozen peas
+function sPeas(t) {
+  const lt = t - T.peas;
+  if (lt < 5.0) { // abuela goes to the freezer and comes back with the bag
+    setCam(camLerp({ x: 540, y: 1150, z: 1.0 }, { x: 560, y: 1140, z: 1.08 }, seg(lt, 0, 5)));
+    compose(t, OPT({
+      bg: () => { livingBG(0); radiator(300, 1460, 0.8, 0, t); },
+      ch: tt => {
+        sofa(420, 1680, 0.9, '#5B7FD0');
+        thermostat(TH.x, TH.y, TH.s, 19, { locked: 1, bag: lt > 4.0 ? {} : undefined });
+        paco({ outfit: 'pacoCasa', x: 440, y: 1640, s: 0.8, t: tt, footL: [-120, -60], footR: [80, -60], handL: [-170, -330], handR: [170, -330], face: { mouth: 'smile', eyes: 'closed' } });
+        const go = lt < 2.2, ax = go ? lerp(220, -300, easeIn(prog(lt, 0.4, 2.0))) : lerp(-300, 560, easeOut(prog(lt, 2.4, 3.8)));
+        const wc = walkCycle(tt, 10, 18, 0.6), walking = (lt > 0.4 && lt < 2.0) || (lt > 2.4 && lt < 3.8);
+        const withBag = !go, hand = withBag ? (lt > 3.8 ? [TH.x, TH.y + 60] : [ax + 130, 1250]) : null;
+        if (ax > -280) abuWrapped({ x: ax, y: 1700, s: 0.76, t: tt, footL: walking ? wc.footL : undefined, footR: walking ? wc.footR : undefined, face: { mouth: withBag ? 'smirk' : 'flat', eyes: 'half', look: [1, -0.3] } }, hand ? [hand[0], hand[1], 'grab'] : null);
+        if (withBag && lt < 4.0) peasBag(hand[0] + 20, hand[1] - 20, 0.42, 0.2);
+      },
+      over: tt => { if (lt > 4.0 && lt < 4.6) boom('¡PLAF!', 760, 820, 90, '#FFFFFF', '#4FA3E8', t, T.peas + 4.0, 0.08, 0.8); },
+    }));
+    return;
+  }
+  if (lt < 8.2) { // close-up: temperature falls, flame on
+    const temp = Math.max(12, 19 - Math.floor(Math.max(0, lt - 5.6) / 0.18));
+    thermoCU(t, temp, null, 0, null, { locked: 1, bag: {}, flame: temp <= 13,
+      after: tt => { if (lt > 5.2) { ctx.save(); ctx.globalAlpha = 0.85; ctx.fillStyle = '#DFF4FF'; for (let i = 0; i < 10; i++) { const p = (tt * 0.6 + hash(i)) % 1; ell(400 + hash(i + 2) * 280, 1180 + p * 380, 8, 8); ctx.fill(); } ctx.restore(); } },
+      over: tt => { boom('¡FUUUM!', 540, 600, 120, '#FFF3B0', '#FF5D2E', t, T.peas + 7.3, -0.05, 0.9); if (lt > 7.3) shockBurst(540, 980, 520, tt, '#FF8A4A', 0.25); } });
+    return;
+  }
+  // heat wave: Paco melting in a tee, abuela fanning herself happily
+  const heat = seg(lt, 8.2, 9.5), gl = seg(lt, 12.0, 13.0);
+  setCam(lt < 12 ? camLerp({ x: 540, y: 1150, z: 1.0 }, { x: 540, y: 1160, z: 1.06 }, seg(lt, 8.2, 12)) : camLerp({ x: 540, y: 1160, z: 1.06 }, { x: 420, y: 1060, z: 1.5 }, seg(lt, 12, 13.2)));
+  compose(t, OPT({
+    bg: () => { livingBG(1); radiator(300, 1460, 0.8, 1, t); },
+    ch: tt => {
+      sofa(420, 1680, 0.9, '#5B7FD0');
+      thermostat(TH.x, TH.y, TH.s, 12, { locked: 1, bag: {}, flame: true });
+      const o = { outfit: 'pacoCalor', x: 400, y: 1640, s: 0.8, t: tt, footL: [-120, -60], footR: [80, -60] };
+      if (lt < 12) Object.assign(o, { handL: [-240 + wv(tt, 14, 30), -640 + wv(tt, 14, 40)], poseL: 'open', handR: [170, -300], face: { mouth: 'open', eyes: 'teary', sweat: tt * 4, flush: 0.7 * heat, look: [0, -1], t: tt } });
+      else Object.assign(o, { handR: [200, -620], poseR: 'grab', holdR: (hx, hy) => smallKey(hx + 6, hy - 30, 1.2, -1.2), handL: [-170, -320], face: { mouth: 'wobble', eyes: 'open', look: [0.5, -0.6], sweat: tt * 4, flush: 0.7, gloom: gl, t: tt } });
+      paco(o);
+      // abuela without the blanket, fanning with a newspaper
+      abuela({ x: 850, y: 1660, s: 0.78, t: tt, handR: [160 + wv(tt, 16, 40), -600 + wv(tt, 16, 30)], poseR: 'grab', holdR: (hx, hy) => { ctx.save(); ctx.translate(hx, hy - 50); ctx.rotate(-0.3 + wv(tt, 16, 0.3)); roundRect(-70, -90, 140, 180, 6); fillLine('#FFFFFF', 5); ctx.fillStyle = 'rgba(0,0,0,0.3)'; for (let i = 0; i < 5; i++) ctx.fillRect(-50, -60 + i * 28, 100, 10); ctx.restore(); },
+        handL: [-160, -300], face: { mouth: 'smile', eyes: 'happy', look: [-0.4, 0] } });
+      if (lt > 8.4) { ctx.save(); ctx.globalAlpha = heat; manta(1000, 1700, 260, 140, '#E8798F', 0); ctx.restore(); }
+    },
+    over: tt => { if (lt < 12) { ctx.save(); ctx.globalAlpha = 0.35 * heat; for (let i = 0; i < 6; i++) { const p = (tt * 0.5 + i / 6) % 1; ctx.strokeStyle = '#FF9A5A'; ctx.lineWidth = 10; ctx.beginPath(); const x = 100 + i * 180; ctx.moveTo(x, 1500 - p * 900); ctx.bezierCurveTo(x + 40, 1440 - p * 900, x - 40, 1380 - p * 900, x, 1320 - p * 900); ctx.stroke(); } ctx.restore(); } },
+    grade: WARM, light: [{ x: 300, y: 1300, r: 700, col: 'rgba(255,140,80,A)', a: 0.35 * heat }],
+  }));
+}
+</script></body></html>

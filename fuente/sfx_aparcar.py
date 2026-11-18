@@ -1,0 +1,23 @@
+import sys; sys.argv=['x','46']; exec(open('sfx_saga.py').read())
+add(swoosh(0.3),0.2,0.3)
+engine(0.0,2.8,0.14,50,62); bouncy(2.6,8.0,0.12,0,0.26)
+kf=[9.0,10.0,11.0,12.0,12.9,13.8,14.7,19.0,19.9,20.7,21.4,22.0]
+for i,k in enumerate(kf): engine(k-0.9,k,0.12,55+(i%2)*15,75); 
+for k in [10.0,12.0,13.8,19.9,21.4]: 
+    for j in range(3): add(chirp(1000,1000,0.18),k-0.9+j*0.3,0.08)
+add(thud(0.3,160),12.85,0.5); add(bell(n(19),0.5),13.0,0.15)
+bouncy(8.0,15.4,0.12,-2,0.2); bouncy(18.2,22.0,0.14,-2,0.17)
+for k in np.arange(15.4,18.2,0.25): screech(k,0.2,0.12)
+add(swoosh(0.25),15.3,0.3); add(swoosh(0.25),18.1,0.3)
+add(thud(0.4,90),18.95,0.6); add(noise_burst(0.3,0.3,0.1),18.95,0.3)
+for k in np.arange(20.6,21.6,0.25): add(chirp(900,1300,0.12),k,0.15); add(chirp(1300,900,0.12),k+0.12,0.15)
+fanfare(22.0,0.35); add(choir([n(0),n(4),n(7)],1.5,0.12),22.2,0.2)
+for k in np.arange(22.4,25,0.08): add(noise_burst(0.05,0.8,0.02),k*1.0+rng.random()*0.05,0.06)
+bouncy(23.0,30.0,0.12,0,0.22)
+engine(31.0,32.6,0.25,60,110); engine(32.6,34.2,0.25,60,110)
+add(choir([n(-12),n(-11),n(-7)],2.0,0.06),33.4,0.15)
+for k in np.arange(33.6,36.6,0.3): add(noise_burst(0.15,0.4,0.05),k,0.08)
+engine(37.2,38.8,0.15,70,90); add(thud(0.15,1400),38.6,0.3); add(bell(n(26),0.8),38.6,0.2)
+for k in np.arange(39.0,41.5,0.08): add(noise_burst(0.05,0.8,0.02),k+rng.random()*0.05,0.06)
+sadtrombone(41.6,0.3)
+save('audio_aparcar.wav')

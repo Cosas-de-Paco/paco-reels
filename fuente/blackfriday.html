@@ -1,0 +1,119 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>@font-face{font-family:"Fredoka";src:url("Fredoka.ttf")}html,body{margin:0;padding:0;background:#000}canvas{display:block}</style>
+</head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="common.js"></script><script src="hd.js"></script><script src="fx.js"></script><script src="body2.js"></script><script src="cel.js"></script><script src="props14.js"></script><script src="lib.js"></script><script src="arms.js"></script><script src="anim.js"></script><script src="p20.js"></script>
+<script>
+// Reel 23: Black Friday
+const T = { wait: 5.8, night: 9, buy: 19, party: 21.6, morning: 27, cu: 29.6, real: 33.6, cyber: 38, end: 46 };
+const DAY = { top: '#FFE0B0', bot: '#5B8FD0', a: 0.26 }, NIGHT = { top: '#7A8CFF', bot: '#2A1A5A', a: 0.35 };
+const OPT = o => Object.assign({ dof: 3, grade: DAY, rim: { col: '#FFE6B5', a: 0.5 }, bloom: 0.22, vig: 0.36 }, o);
+
+window.draw = function (t) {
+  if (t < T.wait) sShop(t, { price: '79 €', head: 'TIENDAZO' });
+  else if (t < T.night) sBed(t, 'wait');
+  else if (t < T.buy) sBed(t, 'night');
+  else if (t < T.party) sShop(t, { dark: true, head: 'BLACK FRIDAY', tag: '-70%', old: '299 €', price: '89,70 €', priceCol: '#E8233A', press: t > 19.7 && t < 20.0 ? 1 : 0, bought: t > 20.0 });
+  else if (t < T.morning) sBed(t, 'party');
+  else if (t < T.cu) sBed(t, 'morning');
+  else if (t < T.real) sShop(t, { dark: true, head: 'BLACK FRIDAY', tag: '-70%', old: '299 €', price: '89,70 €', priceCol: '#E8233A', note: t > 30.6 ? 'Precio hace 7 días: 79 €' : null, noteCol: '#E8233A', bought: true });
+  else if (t < T.cyber) sBed(t, 'real');
+  else sBed(t, 'cyber');
+  ctx = MAINCTX; ctx.setTransform(1, 0, 0, 1, 0, 0);
+  caption2('Lunes. La freidora\nque quiere: *79€*', t, 2.8, 5.6, 230);
+  caption2('Paco espera\nal *Black* *Friday*', t, 6.0, 8.8);
+  caption2('Jueves, *23:59*', t, 9.4, 12.2);
+  caption2('Ojeras, cafeína\ny el dedo listo', t, 12.6, 15.6);
+  caption2('*-70%.* ¡A por ella!', t, 19.1, 21.4, 230);
+  caption2('00:01.\n*Misión* *cumplida*', t, 22.0, 25.2);
+  caption2('A la mañana siguiente…', t, 27.3, 29.5);
+  caption2('¿299 €? Hace una\nsemana costaba *79€*', t, 30.8, 33.5, 230);
+  caption2('Pagó *10,70€* más…\npor el descuento', t, 34.0, 37.8);
+  caption2('Y el lunes…', t, 38.3, 40.4);
+  caption2('¿Tú también\nhas picado?', t, 42.6, 45.8);
+  titleCard(t, 0.25, 2.5, 'Black Friday', 'Paco caza una oferta', '#FF4D6D');
+  grain(t, 0.045);
+  irisIn(t, 0, 0.6);
+  irisOut(t, T.end - 0.5, 0.5);
+  for (const c of [T.wait, T.night, T.buy, T.party, T.morning, T.cu, T.real, T.cyber]) whip(t, c);
+};
+function sShop(t, o) {
+  setCam(camLerp({ x: 540, y: 1040, z: 1.0 }, { x: 540, y: 1060, z: 1.06 }, seg(t % 10, 0, 6)));
+  compose(t, OPT({
+    bg: () => { ctx.fillStyle = o.dark ? '#16100F' : '#2A3550'; ctx.fillRect(-300, -300, W + 600, H + 600); halftone(-300, 0, W + 600, 2200, o.dark ? 'rgba(255,77,109,0.12)' : 'rgba(255,255,255,0.05)', 30); },
+    dof: 0, rim: false, shadow: 0.25,
+    ch: tt => {
+      shopScreen(540, 1110, 1.0, o);
+      if (o.press !== undefined && t > 19.4) { // finger smashes the button
+        const p = t < 19.7 ? seg(t, 19.4, 19.7) : t < 20.2 ? 1 : 1 - seg(t, 20.2, 20.6);
+        hdArm([980, 2100], [lerp(1000, 600, p), lerp(2000, 1600, p)], 1, { k: 2.4, sleeve: '#5B7FD0', skin: SK, pose: 'point', side: 1 });
+      }
+    },
+    over: tt => {
+      if (o.bought && t < T.party) { boom('¡COMPRADO!', 540, 760, 120, '#FFF3B0', '#3FBF6A', t, 20.0, -0.05, 1.6); confetti(tt, 20.0, 70); }
+      if (o.note && t < 31.6) { ctx.save(); ctx.strokeStyle = '#E8233A'; ctx.lineWidth = 10; ctx.globalAlpha = seg(t, 30.6, 31.0); ell(540, 1440, 300, 60); ctx.stroke(); ctx.restore(); }
+      if (t > 19.0 && t < 19.6) shockBurst(710, 790, 300, tt, '#FF4D6D', 0.4);
+    },
+    grade: o.dark ? { top: '#FF7A9A', bot: '#2A1A5A', a: 0.25 } : DAY,
+  }));
+}
+function bed(duvetCol = '#F2B33A') { roundRect(80, 1100, 920, 360, 40); fillLine(lgrad(80, 1000, '#8A5A3A'), 9); }
+function duvet(col, t) { ctx.beginPath(); ctx.moveTo(40, 1960); ctx.lineTo(40, 1450); ctx.quadraticCurveTo(300, 1380, 540, 1430); ctx.quadraticCurveTo(800, 1380, 1040, 1450); ctx.lineTo(1040, 1960); ctx.closePath(); fillLine(lgrad(40, 1040, col), 9);
+  ctx.strokeStyle = shade(col, -0.3); ctx.lineWidth = 6; for (const x of [260, 540, 820]) { ctx.beginPath(); ctx.moveTo(x, 1460); ctx.quadraticCurveTo(x + 30, 1650, x, 1900); ctx.stroke(); } }
+function nightstand(t, cans) { roundRect(-40, 1380, 220, 400, 14); fillLine(lgrad(-40, 180, '#6A4A3A'), 8);
+  for (let i = 0; i < cans; i++) energyCan(10 + (i % 3) * 52, 1380 - Math.floor(i / 3) * 4, 0.8, (hash(i) - 0.5) * 0.3, ['#3FD0C9', '#FF4D6D', '#FFD23F'][i % 3]); }
+function sBed(t, mode) {
+  const night = mode === 'night' || mode === 'party';
+  const lt = t - (mode === 'night' ? T.night : mode === 'party' ? T.party : mode === 'morning' ? T.morning : mode === 'real' ? T.real : mode === 'cyber' ? T.cyber : T.wait);
+  let cam = { x: 540, y: 1150, z: 1.0 };
+  if (mode === 'night') cam = lt < 7.5 ? camLerp({ x: 540, y: 1150, z: 1.0 }, { x: 540, y: 1000, z: 1.35 }, seg(lt, 0, 7.5)) : { x: 540, y: 950, z: 1.7 };
+  if (mode === 'real') cam = camLerp({ x: 540, y: 1100, z: 1.05 }, { x: 540, y: 960, z: 1.55 }, seg(lt, 0.4, 2.4));
+  if (mode === 'cyber') cam = camLerp({ x: 540, y: 1000, z: 1.4 }, { x: 540, y: 1100, z: 1.05 }, seg(lt, 0, 1.2));
+  setCam(cam);
+  if (mode === 'night' && lt > 7.5) shakeCam(t, 6);
+  const o = { outfit: 'pacoPijama', x: 540, y: 1760, s: 1, t: 0 };
+  compose(t, OPT({
+    bg: () => bedNightBG(night ? 0 : 1),
+    mid: () => bed(),
+    ch: tt => {
+      o.t = tt;
+      nightstand(tt, mode === 'night' ? 1 + Math.min(5, Math.floor(lt * 0.8)) : night || mode === 'morning' || mode === 'real' ? 6 : 0);
+      const ph = (txt, glow) => (hx, hy) => { phone(hx, hy - 60, 1.0, txt, -0.1); };
+      if (mode === 'wait') Object.assign(o, { handL: [-60 + wv(tt, 12, 20), -560], handR: [60 - wv(tt, 12, 20), -560], poseL: 'grab', poseR: 'grab', face: { mouth: 'grin', eyes: 'half', look: [0.6, -0.4], brow: { raise: 0.6 } } });
+      if (mode === 'night') { const twitch = lt > 3 ? wv(tt, 30, 1) : 0, tense = lt > 7.5;
+        Object.assign(o, { handR: [120, -700], poseR: 'grab', holdR: ph(hhmm(23 * 60 + 59)), handL: [40 + (tense ? wv(tt, 40, 8) : 0), -660], poseL: 'point', lean: twitch * 0.01,
+          face: { mouth: tense ? 'wobble' : 'flat', eyes: 'wide', eyeScale: 1 + seg(lt, 0, 8) * 0.4, look: [0.5, -0.3], sweat: tense ? tt * 3 : 0, t: tt } }); }
+      if (mode === 'party') { const sleep = lt > 3.4, a = tt * 10;
+        if (!sleep) Object.assign(o, { handL: [-250 + wv(a, 1, 40), -760 + wv(a, 1, 60)], handR: [250 + wv(a, 1, 40, 2), -760 + wv(a, 1, 60, 2)], poseL: 'fist', poseR: 'fist', lean: wv(a, 0.5, 0.08), face: { mouth: 'grin', eyes: 'happy', look: [0, 0] } });
+        else Object.assign(o, { y: 1760 + seg(lt, 3.4, 4.0) * 160, lean: seg(lt, 3.4, 4.0) * 0.5, handL: [-170, -330], handR: [170, -330], face: { mouth: 'open', eyes: 'closed' } }); }
+      if (mode === 'morning') Object.assign(o, { handL: [-140, -560], poseL: 'grab', holdL: (hx, hy) => mug(hx - 10, hy - 30, 0.8), handR: [120, -680], poseR: 'grab', holdR: ph('9:00'), face: { mouth: 'smile', eyes: 'half', look: [0.4, -0.4] } });
+      if (mode === 'real') { const drop = lt > 1.6;
+        Object.assign(o, { handL: drop ? [-200, -330] : [-140, -560], poseL: 'open', holdL: drop ? undefined : (hx, hy) => mug(hx - 10, hy - 30, 0.8), handR: [120, -680], poseR: 'grab', holdR: ph('89,70'),
+          face: { mouth: lt > 1.0 ? 'wobble' : 'o', eyes: lt > 1.0 ? 'teary' : 'wide', look: [0.4, -0.4], brow: { raise: 1 }, gloom: seg(lt, 2.0, 2.8), t: tt } });
+        if (drop) { const p = prog(lt, 1.6, 2.1); mug(400 - p * 40, lerp(1150, 1600, p * p), 0.8); } }
+      if (mode === 'cyber') { const hype = lt > 1.6;
+        Object.assign(o, { handR: [120, -700], poseR: 'grab', holdR: (hx, hy) => { phone(hx, hy - 60, 1.0, '-80%', -0.1); if (lt < 1.6) motionArcs(hx, hy - 60, 90, -0.8, 0.8, 0.8); }, handL: hype ? [-60 + wv(tt, 14, 20), -580] : [-170, -330], poseL: 'grab',
+          face: { mouth: hype ? 'grin' : 'wobble', eyes: hype ? 'wide' : 'teary', look: [0.4, -0.4], gloom: hype ? 0 : 1, t: tt } }); }
+      paco(o);
+      if (mode === 'night' || mode === 'cyber' || mode === 'party') eyeBags(o, mode === 'night' ? 0.4 + seg(lt, 0, 8) * 0.6 : 1);
+      if (mode === 'cyber' && lt > 1.6) starEyes(o, tt);
+      if (mode === 'party' && lt > 3.6) zzz(tt, 720, 1200);
+      duvet(night ? '#5B6FD0' : '#F2B33A', tt);
+    },
+    over: tt => {
+      if (mode === 'wait') bubble2(760, 760, '¡Espera al -70%!', tt, T.wait + 0.6, T.night, 620, 1000, 56);
+      if (mode === 'night') { const sec = Math.max(0, Math.min(10, Math.floor(lt - 0.5)));
+        ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); bigCount(540, 470, sec >= 10 ? '00:00:00' : '23:59:' + String(50 + sec).padStart(2, '0'), sec >= 8 ? '#FF4D6D' : '#FFD23F', 110 + (sec >= 7 ? Math.sin(tt * 20) * 6 : 0)); ctx.restore();
+        const [x, y] = headPos(o); if (lt > 7.5) { speedLines(tt, x, y, 0.35); } }
+      if (mode === 'party' && lt < 3.4) { confetti(tt, T.party, 50); boom('¡TOMA!', 760, 820, 110, '#FFF3B0', '#FF4D6D', t, T.party + 0.2, 0.08, 1.4); }
+      if (mode === 'real' && lt > 1.6 && lt < 2.6) boom('¡CRASH!', 380, 1500, 90, '#FFFFFF', '#E8473A', t, T.real + 2.0, -0.1, 0.8);
+      if (mode === 'cyber') { boom('¡BZZZ!', 820, 760, 80, '#FFFFFF', '#3FD0C9', t, T.cyber + 0.3, 0.1, 1.0); boom('CYBER MONDAY -80%', 540, 760, 86, '#FFF3B0', '#FF4D6D', t, T.cyber + 1.6, -0.05, 4.0);
+        if (lt > 1.6) { const [x, y, R] = headPos(o); shockBurst(x, y, 520, tt, '#FFE14D', 0.1); } }
+    },
+    grade: night ? NIGHT : DAY,
+    light: night ? [{ x: 700, y: 1000, r: 520, col: 'rgba(120,190,255,A)', a: 0.45 }] : undefined,
+    rim: night ? { col: '#9FD0FF', a: 0.6 } : { col: '#FFE6B5', a: 0.5 },
+  }));
+}
+</script></body></html>

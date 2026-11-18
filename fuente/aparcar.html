@@ -1,0 +1,128 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>@font-face{font-family:"Fredoka";src:url("Fredoka.ttf")}html,body{margin:0;padding:0;background:#000}canvas{display:block}</style>
+</head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="common.js"></script><script src="hd.js"></script><script src="fx.js"></script><script src="body2.js"></script><script src="cel.js"></script><script src="props14.js"></script><script src="lib.js"></script><script src="arms.js"></script><script src="anim.js"></script><script src="p20.js"></script>
+<script>
+// Reel 22: El aparcamiento imposible
+const T = { man: 8, cu: 15.4, cu2: 18.2, ok: 22, leave: 30, abu: 37, end: 46 };
+const GR = { top: '#FFE0B0', bot: '#5B8FD0', a: 0.26 };
+const OPT = o => Object.assign({ dof: 0, bgPar: 1, grade: GR, rim: { col: '#FFE6B5', a: 0.5 }, bloom: 0.2, vig: 0.32 }, o);
+const S = 0.5, CURB = 1590, LANE = 1770;
+// manoeuvre keyframes [time, x, y, rot]
+const KF = [[0, -700, LANE, 0], [2.6, 560, LANE, 0], [8, 560, LANE, 0],
+  [9.0, 420, 1680, 0.18], [10.0, 600, 1700, -0.1], [11.0, 420, 1640, 0.25], [12.0, 520, 1690, 0.05], [12.9, 390, 1650, 0.2],
+  [13.8, 640, 1720, -0.2], [14.7, 470, 1620, 0.15], [15.4, 470, 1620, 0.15],
+  [18.2, 470, 1620, 0.15], [19.0, 560, 1520, -0.16], [19.9, 700, 1640, 0.1], [20.7, 820, 1600, -0.12], [21.4, 600, 1610, 0.05], [22.0, 540, CURB, 0]];
+function carPos(t) { if (t >= KF[KF.length - 1][0]) return KF[KF.length - 1].slice(1);
+  for (let i = 0; i < KF.length - 1; i++) { const a = KF[i], b = KF[i + 1]; if (t < b[0]) { const p = i === 0 ? easeOut(prog(t, a[0], b[0])) : smooth(prog(t, a[0], b[0])); return [lerp(a[1], b[1], p), lerp(a[2], b[2], p), lerp(a[3], b[3], p)]; } } }
+function manCount(t) { if (t < 8) return 0; let n = 0; for (const k of KF) if (k[0] > 8 && k[0] <= t + 0.05) n++; return Math.min(14, Math.round(n * 14 / 13)); }
+
+window.draw = function (t) {
+  if (t >= T.cu && t < T.cu2) sWheel(t); else sStreet(t);
+  ctx = MAINCTX; ctx.setTransform(1, 0, 0, 1, 0, 0);
+  caption2('Un hueco\n*enorme*', t, 3.0, 6.4);
+  caption2('Pan comido', t, 6.6, 8.6);
+  const n = manCount(t);
+  if (t > 8.6 && t < 22.6) bigCount(540, 300, 'Maniobra ' + Math.max(1, n), n > 9 ? '#FF4D6D' : '#FFD23F', 76);
+  caption2('Los vecinos\nsacan *palomitas*', t, 11.4, 14.6, 470);
+  caption2('*Maniobra* *14.*\n¡Perfecto!', t, 23.0, 26.4);
+  caption2('Y justo entonces…', t, 30.4, 33.0);
+  caption2('…se van los de\n*delante* y *detrás*', t, 33.2, 36.6);
+  caption2('La abuela:\nuna *maniobra*', t, 39.0, 42.0);
+  caption2('¿Cuántas maniobras\nnecesitas tú?', t, 42.6, 45.8);
+  titleCard(t, 0.25, 2.5, 'Aparcar', 'en un hueco enorme', '#FFD23F');
+  grain(t, 0.045);
+  irisIn(t, 0, 0.6);
+  irisOut(t, T.end - 0.5, 0.5);
+  for (const c of [T.cu, T.cu2]) whip(t, c);
+};
+function rcar(x, y, s, rot, col, o) { ctx.save(); ctx.translate(x, y); ctx.rotate(rot); car(0, 0, s, col, o); ctx.restore(); }
+// neighbours in the windows of the third row
+const WIN = [[60, 880], [400, 880], [740, 880], [400, 500]];
+function neighbour(i, who, outfit, t, appear, mood) {
+  if (t < appear) return; const [wx, wy] = WIN[i], p = easeOutBack(prog(t, appear, appear + 0.5), 1.6);
+  ctx.save(); roundRect(wx + 8, wy + 8, 244, 284, 6); ctx.clip();
+  const o = { who, outfit, x: wx + 130, y: wy + 455 + (1 - p) * 300, s: 0.42, t, handL: [-160, -330], handR: [160, -330] };
+  if (mood === 'pop') Object.assign(o, { handR: [110, -560], poseR: 'grab', holdR: (hx, hy) => popcorn(hx, hy - 10, 1.8), handL: [-20, -680 + wv(t, 8, 30)], poseL: 'grab', face: { mouth: Math.floor(t * 4) % 2 ? 'chew' : 'grin', eyes: 'open', look: [0, 1] } });
+  if (mood === 'laugh') Object.assign(o, { handL: [-60, -560 + wv(t, 14, 20)], handR: [60, -560 + wv(t, 14, 20, 1)], poseL: 'open', poseR: 'open', face: { mouth: 'grin', eyes: 'happy', look: [0, 1] } });
+  if (mood && mood[0] === '#') Object.assign(o, { handR: [200, -560], poseR: 'grab', face: { mouth: 'smile', eyes: 'happy', look: [0, 1] } });
+  if (mood === 'wow') Object.assign(o, { face: { mouth: 'o', eyes: 'wide', look: [0, 1], brow: { raise: 1 } } });
+  person(o); if (mood && mood[0] === '#') scoreCard(wx + 196, wy + 150, 0.72, mood.slice(1), 0.08 + wv(t, 3, 0.05)); ctx.restore(); balconyRail(wx - 10, wy + 190, 280);
+}
+// ---------- the street
+function sStreet(t) {
+  const [px, py, pr] = carPos(Math.min(t, 22));
+  const leaveY = easeIn(prog(t, 31.0, 32.4)), leaveB = easeIn(prog(t, 32.6, 34.0));
+  const abuP = prog(t, 37.2, 39.0);
+  const shake = (t > 12.85 && t < 13.2) || (t > 18.95 && t < 19.3);
+  setCam(t < T.abu ? camLerp({ x: 540, y: 1330, z: 1.22 }, { x: 540, y: 1300, z: 1.2 }, seg(t, 0, 8)) : camLerp({ x: 540, y: 1300, z: 1.2 }, { x: 440, y: 1380, z: 1.4 }, seg(t, 41.5, 43)));
+  if (shake) shakeCam(t, 10);
+  compose(t, OPT({
+    bg: () => blockBG(0),
+    ch: tt => {
+      // neighbours
+      const after = t > T.ok + 0.6, leave = t > 33.4, abu = t > 39.0;
+      neighbour(0, 'senora', 'senora', tt, 11.0, abu ? '#10' : leave ? 'laugh' : after ? '#9,5' : 'pop');
+      neighbour(2, 'senor', 'senor', tt, 12.6, abu ? '#10' : leave ? 'laugh' : after ? '#10' : 'pop');
+      neighbour(1, 'chico', 'chico', tt, 14.2, abu ? '#10' : leave ? 'laugh' : after ? '#8' : 'pop');
+      neighbour(3, 'abuela', 'abuela', tt, 16.0, abu ? 'wow' : leave ? 'laugh' : after ? '#9' : 'pop');
+      // cones on the kerb
+      const coneHit = t > 12.85, cp = prog(t, 12.85, 13.6);
+      cone(300 - (coneHit ? cp * 340 : 0), 1470 + (coneHit ? -Math.sin(cp * Math.PI) * 300 : 0), 0.7, coneHit ? cp * 7 : 0);
+      cone(880, 1470, 0.7);
+      // parked cars: yellow behind (left), blue in front (right)
+      if (leaveY < 1) rcar(30 - leaveY * 900, CURB, S, 0, '#F2D06A', {});
+      if (leaveB < 1) rcar(1050 + leaveB * 900, CURB, S, 0, '#8FA8E8', {});
+      // abuela's little red car: one smooth move into the space behind
+      if (t > 37.2) { const ax = lerp(-500, 150, easeOut(Math.min(1, abuP * 1.4))), ay = abuP < 0.6 ? LANE : lerp(LANE, CURB, smooth(prog(abuP, 0.6, 1))), ar = abuP > 0.6 && abuP < 1 ? Math.sin(prog(abuP, 0.6, 1) * Math.PI) * 0.12 : 0;
+        rcar(ax, ay, 0.42, ar, '#E8233A', { inside: () => person({ who: 'abuela', outfit: 'abuela', x: 190, y: 75, s: 0.47, t: tt, handR: [190, -420], poseR: 'grab', handL: [-120, -300], face: { mouth: 'smile', eyes: t > 39 ? 'happy' : 'open', look: [1, 0] } }) }); }
+      // Paco's car (and Paco himself once parked)
+      const inside = t < T.ok + 1.0;
+      const face = t < 8 ? { mouth: t > 3.4 ? 'grin' : 'smile', eyes: t > 3.4 ? 'happy' : 'open', look: [1, 0] } : t < T.ok ? { mouth: Math.floor(tt * 3) % 2 ? 'scream' : 'wobble', eyes: 'wide', look: [-1, 0], sweat: tt * 3, brow: { raise: 1 }, t: tt } : { mouth: 'grin', eyes: 'happy', look: [1, 0] };
+      rcar(px, py, S, pr, '#3FA7A0', { inside: inside ? () => pacoE({ outfit: 'pacoCasa', behindArms: undefined, x: 190, y: 75, s: 0.47, t: tt, face, handR: t > 3.4 && t < 6.4 ? [190, -680] : [230, -420], poseR: t > 3.4 && t < 6.4 ? 'thumb' : 'grab', handL: [-120, -300] }) : undefined });
+      if (!inside) { // out of the car on the road side
+        const lt = t - T.ok, step = easeOut(prog(lt, 1.0, 1.6));
+        const o = { outfit: 'pacoCasa', x: lerp(560, 760, step), y: 1880, s: 0.62, t: tt };
+        if (t < T.leave + 1.0) Object.assign(o, { handL: [-250, -770], handR: [250, -770], poseL: 'fist', poseR: 'fist', face: { mouth: 'grin', eyes: 'happy', look: [0, -1] } });
+        else if (t < T.abu + 1.8) Object.assign(o, { handL: [-200, -330], handR: [200, -330], poseL: 'open', poseR: 'open', face: { mouth: 'scream', eyes: 'wide', eyeScale: 1.2, brow: { raise: 1 }, look: [t < 32.5 ? -1 : 1, 0], sweat: tt * 2 } });
+        else Object.assign(o, { handL: [-170, -320], handR: [170, -320], face: { mouth: 'wobble', eyes: 'teary', look: [-1, 0], gloom: seg(t, 39.6, 40.4), t: tt } });
+        person(Object.assign({ who: 'paco' }, o));
+      }
+      if (t > 8 && t < 22) { const back = Math.floor((t - 8) / 0.95) % 2 === 0; streaks(px + (back ? 260 : -260), py - 60, back ? 1 : -1, 0, 120, 3, 0.5, 60); }
+    },
+    over: tt => {
+      boom('¡PLONC!', 300, 1180, 90, '#FFFFFF', '#FF7A2E', t, 12.85, -0.1, 0.9);
+      boom('¡CATAPUM!', 560, 1220, 90, '#FFFFFF', '#E8473A', t, 18.95, 0.08, 0.9);
+      boom('¡NINO NINO!', 860, 1250, 70, '#FFFFFF', '#2F8FD6', t, 20.6, 0.1, 1.0);
+      boom('¡PERFECTO!', 540, 1180, 110, '#FFF3B0', '#3FBF6A', t, T.ok, -0.05, 1.4);
+      if (t > T.ok + 0.3 && t < T.leave) confetti(tt, T.ok + 0.3, 50);
+      boom('¡BRRRUM!', 240, 1300, 80, '#FFFFFF', '#8A8E9A', t, 31.0, -0.1, 1.0);
+      boom('¡BRRRUM!', 860, 1300, 80, '#FFFFFF', '#8A8E9A', t, 32.6, 0.1, 1.0);
+      boom('¡CHAS!', 200, 1300, 110, '#FFFFFF', '#E8233A', t, 38.6, -0.08, 1.0);
+      if (t > 38.6 && t < 39.6) sparkles(tt, 180, 1450, 6, 200);
+      if (t > 32.5 && t < 36) { const [x, y, R] = headPos({ x: 760, y: 1880, s: 0.62 }); surprise(x, y, R * 1.1, tt, 32.5); }
+    },
+  }));
+}
+// ---------- close-up: spinning the wheel
+function sWheel(t) {
+  const lt = t - T.cu;
+  setCam(camLerp({ x: 540, y: 1000, z: 1.0 }, { x: 540, y: 980, z: 1.1 }, seg(lt, 0, 2.8)));
+  shakeCam(t, 3);
+  compose(t, OPT({
+    bg: () => blockBG(0), dof: 8, bgPar: 0.85,
+    mid: () => cabin(),
+    ch: tt => {
+      const a = tt * 14;
+      pacoE({ outfit: 'pacoCasa', behindArms: undefined, x: 470, y: 1720, s: 1, t: tt, handL: [120 + Math.cos(a) * 120, -470 + Math.sin(a) * 120], handR: [120 + Math.cos(a + Math.PI) * 120, -470 + Math.sin(a + Math.PI) * 120], poseL: 'grab', poseR: 'grab',
+        face: { mouth: 'scream', eyes: 'wide', look: [Math.sin(tt * 6), 0], sweat: tt * 4, flush: 0.5, brow: { raise: 1 }, t: tt } });
+    },
+    fg: () => { wheelCU(600, 1250, t * 14); carDoorCU('#3FA7A0'); },
+    fgPar: 1,
+    over: tt => { motionArcs(600, 1250, 220, 0, 6, 0.6); boom('¡ÑIC ÑIC ÑIC!', 540, 620, 80, '#FFFFFF', '#FF5D2E', t, T.cu + 0.4, -0.05, 2.2); },
+    rim: { col: '#FFFFFF', a: 0.5 },
+  }));
+}
+</script></body></html>

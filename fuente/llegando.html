@@ -1,0 +1,183 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>@font-face{font-family:"Fredoka";src:url("Fredoka.ttf")}html,body{margin:0;padding:0;background:#000}canvas{display:block}</style>
+</head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="common.js"></script><script src="hd.js"></script><script src="fx.js"></script><script src="body2.js"></script><script src="cel.js"></script><script src="props14.js"></script><script src="lib.js"></script><script src="arms.js"></script><script src="anim.js"></script><script src="p20.js"></script>
+<script>
+// Reel 21: "Estoy llegando"
+const T = { shower: 8.5, bar: 13, home: 19, bar2: 29, closed: 36, end: 46 };
+const GR = { top: '#FFD7A8', bot: '#5B6FD0', a: 0.28 }, BAR = { top: '#FFC27A', bot: '#7A3FA8', a: 0.3 };
+const OPT = o => Object.assign({ dof: 3, grade: GR, rim: { col: '#FFE6B5', a: 0.5 }, bloom: 0.22, vig: 0.38 }, o);
+const LAURA = { who: 'chica', outfit: 'amiga' }, JAVI = { who: 'amigo', outfit: 'amigo1' }, DANI = { who: 'chico', outfit: 'chico' };
+
+window.draw = function (t) {
+  if (t < T.shower) sChat(t);
+  else if (t < T.bar) sShower(t);
+  else if (t < T.home) sBar(t, 0);
+  else if (t < T.bar2) sHome(t);
+  else if (t < T.closed) sBar(t, 1);
+  else sClosed(t);
+  ctx = MAINCTX; ctx.setTransform(1, 0, 0, 1, 0, 0);
+  caption2('Quedada a las *20:00*', t, 2.8, 5.4, 200);
+  caption2('Paco contesta\nal momento', t, 5.8, 8.3, 200);
+  caption2('…desde la *ducha*', t, 9.0, 12.7);
+  caption2('*20:15.* En el bar', t, 13.4, 16.0);
+  caption2('Mientras tanto,\nen casa de Paco', t, 19.3, 21.9);
+  caption2('*22:40.*\nSiguen esperando', t, 29.4, 32.4);
+  caption2('Dos horas\n«llegando»', t, 32.8, 35.8);
+  caption2('*23:30.* Llega Paco', t, 36.4, 39.0);
+  caption2('¿Tienes un amigo\n«estoy llegando»?', t, 42.6, 45.8);
+  titleCard(t, 0.25, 2.5, 'Estoy llegando', 'Paco y la puntualidad', '#5CD65C');
+  grain(t, 0.045);
+  irisIn(t, 0, 0.6);
+  irisOut(t, T.end - 0.5, 0.5);
+  for (const c of [T.shower, T.bar, T.home, 22.3, 25.6, T.bar2, T.closed, 40.0, 42.4]) whip(t, c);
+};
+function chico3(o, who) { return person(Object.assign({}, who, o)); }
+// ---------- 1. the chat
+function sChat(t) {
+  setCam(camLerp({ x: 540, y: 1000, z: 1.0 }, { x: 540, y: 1060, z: 1.08 }, seg(t, 0, 8.5)));
+  const typed = '¡Estoy llegando!'.slice(0, Math.max(0, Math.floor((t - 4.4) * 9)));
+  compose(t, OPT({
+    bg: () => { ctx.fillStyle = '#2A3550'; ctx.fillRect(-300, -300, W + 600, H + 600); halftone(-300, 0, W + 600, 2200, 'rgba(255,255,255,0.05)', 30); },
+    dof: 0,
+    ch: tt => {
+      chatScreen(540, 1100, 1.0, 'Viernes de bar', [
+        { who: 'Laura', text: 'Ya estamos aquí', time: '20:00', a: prog(t, 2.6, 3.0) },
+        { who: 'Javi', whoCol: '#2F8FD6', text: '¿Dónde estás, Paco?', time: '20:05', a: prog(t, 3.4, 3.8) },
+        { me: true, text: '¡Estoy llegando!', big: true, time: '20:05', a: prog(t, 6.2, 6.6) },
+      ], { ini: 'V', sub: 'Laura, Javi, Dani, tú', typing: t > 4.3 && t < 6.2 ? typed + (Math.floor(t * 4) % 2 ? '|' : '') : null });
+    },
+    rim: false, shadow: 0.2,
+    over: tt => { if (t > 6.2 && t < 7.0) sparkles(tt, 760, 1000, 5, 160); },
+  }));
+}
+// ---------- 2. the reveal: in the shower
+function sShower(t) {
+  const lt = t - T.shower;
+  setCam(camLerp({ x: 560, y: 980, z: 2.2 }, { x: 540, y: 1150, z: 1.0 }, easeOut(prog(lt, 0, 0.9))));
+  compose(t, OPT({
+    bg: () => { bathroomBG(); },
+    ch: tt => {
+      showerHead(330, 520, tt, 1);
+      const o = { outfit: 'ducha', x: 520, y: 2080, s: 1.3, t: tt, handR: [270, -740], poseR: 'grab', holdR: (hx, hy) => phone(hx - 10, hy - 60, 1.1, '20:05', -0.15), handL: [-210, -640 + wv(tt, 10, 30)], poseL: 'open',
+        face: { mouth: lt > 2.4 ? 'grin' : 'smile', eyes: lt > 2.4 ? 'happy' : 'open', look: [0.4, -0.4] } };
+      paco(o); const [hx, hy, R] = headPos(o); shampoo(hx, hy, R, tt);
+    },
+    fg: () => { // frosted shower screen from the chest down
+      roundRect(-60, 1420, 1200, 900, 30); ctx.fillStyle = 'rgba(215,238,250,0.9)'; ctx.fill(); ctx.strokeStyle = LINE; ctx.lineWidth = 12; ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.6)'; ctx.beginPath(); ctx.moveTo(120, 1460); ctx.lineTo(220, 1460); ctx.lineTo(80, 1860); ctx.lineTo(-20, 1860); ctx.fill();
+      for (let i = 0; i < 12; i++) { ell(200 + hash(i) * 700, 1480 + hash(i + 3) * 380, 10, 14); ctx.fillStyle = 'rgba(160,210,240,0.8)'; ctx.fill(); } },
+    fgPar: 1,
+    over: tt => { boom('¡¿EN LA DUCHA?!', 540, 640, 100, '#FFFFFF', '#3FA7A0', t, T.shower + 1.0, -0.06, 1.8); smoke(tt, 540, 1400, 0.6, '255,255,255', 4); },
+    rim: { col: '#FFFFFF', a: 0.5 },
+  }));
+}
+// ---------- 3. the bar (late = 0 at 20:15, 1 at 22:40)
+function friends(tt, late, lt) {
+  const beardL = late ? seg(lt, 0.5, 4.0) * 0.9 : 0;
+  const bored = late ? { mouth: 'flat', eyes: 'half', look: [0, 0.4] } : null;
+  const oL = Object.assign({ x: 230, y: 1700, s: 0.78, t: tt }, LAURA), oJ = Object.assign({ x: 540, y: 1690, s: 0.8, t: tt }, JAVI), oD = Object.assign({ x: 850, y: 1700, s: 0.78, t: tt }, DANI);
+  if (!late) {
+    const ping = lt > 3.2;
+    person(Object.assign(oL, { handR: [120, -560], poseR: 'grab', holdR: (hx, hy) => phone(hx, hy - 50, 0.75, '20:15', 0.1), handL: [-170, -330], face: { mouth: ping ? 'smile' : 'flat', eyes: 'open', look: [0.6, 0.6] } }));
+    person(Object.assign(oJ, { handL: [-160, -330], handR: [160, -330], face: { mouth: 'smile', eyes: 'open', look: [-0.6, 0.2] } }));
+    person(Object.assign(oD, { handL: [-160, -330], handR: [160, -330], face: { mouth: 'smile', eyes: 'open', look: [-1, 0] } }));
+  } else {
+    person(Object.assign(oL, { handL: [-60, -560], handR: [60, -560], poseL: 'open', poseR: 'open', face: Object.assign({}, bored, { eyes: 'closed', mouth: 'open' }) }));
+    zzz(tt, 300, 920);
+    person(Object.assign(oJ, { handL: [-160, -330], handR: [160, -330], face: Object.assign({}, bored, { look: [0, 0] }) }));
+    beard(oJ, beardL);
+    person(Object.assign(oD, { handL: [-160, -330], handR: [70, -560], poseR: 'grab', holdR: (hx, hy) => phone(hx, hy - 50, 0.75, '22:40', 0.1), face: Object.assign({}, bored, { mouth: 'frown', look: [-0.5, 0.6] }) }));
+    beard(oD, beardL * 0.7);
+    cobweb(oJ.x - 20, 970, 120 * seg(lt, 2, 5));
+  }
+}
+function sBar(t, late) {
+  const lt = t - (late ? T.bar2 : T.bar);
+  setCam(camLerp({ x: 540, y: 1180, z: 1.05 }, { x: 540, y: 1160, z: 1.12 }, seg(lt, 0, 6)));
+  compose(t, OPT({
+    bg: () => barBG(0, late ? 22 : 20, late ? 40 : 15 + Math.floor(lt)),
+    ch: tt => {
+      friends(tt, late, lt);
+      barTable(540, 1420, 1000);
+      const lv = late ? 0 : 1;
+      beer(250, 1425, 1, lv); beer(560, 1425, 1, lv); beer(860, 1425, 1, lv);
+      if (late) { for (let i = 0; i < 4; i++) beer(370 + i * 20, 1425 - i * 4, 0.7, 0); for (let i = 0; i < 3; i++) beer(690 + i * 24, 1425, 0.7, 0); }
+    },
+    over: tt => {
+      if (!late) { bubble2(600, 760, 'Dice que está llegando', tt, T.bar + 1.0, T.bar + 3.2, 300, 960, 50); bubble2(600, 760, '«5 minutillos»', tt, T.bar + 3.4, T.bar + 5.8, 300, 960, 54); }
+      else { if (lt > 4.2) qmarks(tt, 540, 860, 3); }
+    },
+    grade: BAR, light: [{ x: 300, y: 200, r: 600, col: 'rgba(255,210,120,A)', a: 0.35 }, { x: 780, y: 200, r: 600, col: 'rgba(255,210,120,A)', a: 0.35 }],
+  }));
+}
+// ---------- 4. meanwhile at home: three cuts, each with the message he sends
+function sHome(t) {
+  const lt = t - T.home, k = lt < 3.3 ? 0 : lt < 6.6 ? 1 : 2, ct = lt - k * 3.3;
+  const MSG = ['«Saliendo ya»', '«En el portal»', '«Aparcando»'], TIME = ['20:40', '21:10', '21:35'];
+  setCam(camLerp({ x: 540, y: 1180, z: 1.02 }, { x: 540, y: 1160, z: 1.1 }, seg(ct, 0, 3.3)));
+  compose(t, OPT({
+    bg: () => homeBG(),
+    ch: tt => {
+      if (k === 0) { // two identical hoodies
+        const swap = Math.floor(tt * 1.5) % 2;
+        const hood = (hx, hy, up) => { ctx.save(); ctx.translate(hx, hy + 80); ctx.rotate(up ? 0 : 0.1); roundRect(-90, -40, 180, 220, 30); fillLine(lgrad(-90, 90, '#2E8B7A'), 6); ctx.beginPath(); ctx.arc(0, -40, 40, Math.PI, 0); fillLine('#2E8B7A', 6); ctx.restore(); };
+        paco({ outfit: 'pacoPijama', x: 540, y: 1740, s: 0.95, t: tt, handL: [-260, swap ? -720 : -560], handR: [260, swap ? -560 : -720], poseL: 'grab', poseR: 'grab', holdL: (hx, hy) => hood(hx, hy, swap), holdR: (hx, hy) => hood(hx, hy, !swap),
+          face: { mouth: 'sour', eyes: 'open', look: [swap ? -1 : 1, 0], brow: { angry: 0.3 } } });
+      } else if (k === 1) { // sandwich on the sofa
+        sofa(540, 1760, 0.95, '#C0564A');
+        const bite = Math.floor(ct * 2) % 2;
+        paco({ outfit: 'pacoPijama', x: 540, y: 1700, s: 0.9, t: tt, footL: [-120, -60], footR: [100, -60], handR: [60, bite ? -720 : -600], poseR: 'grab', holdR: (hx, hy) => sandwich(hx, hy - 20, 0.8), handL: [-180, -330], poseL: 'grab', holdL: (hx, hy) => phone(hx, hy - 40, 0.7, 'TV', 0),
+          face: { mouth: bite ? 'chew' : 'smile', eyes: 'happy', look: [0, 0] } });
+      } else { // tying a shoelace sooo slowly
+        sofa(540, 1760, 0.95, '#C0564A');
+        paco({ outfit: 'pacoCalle', x: 540, y: 1700, s: 0.9, t: tt, footL: [-120, -60], footR: [140, -170], kneeR: -1, handL: [100, -230 + wv(tt, 2, 10)], handR: [190, -200 + wv(tt, 2, 10, 1)], poseL: 'grab', poseR: 'grab',
+          face: { mouth: 'flat', eyes: 'half', look: [0.6, 1] } });
+        sneaker(540 + 140 * 0.9 + 20, 1700 - 170 * 0.9 + 30, 0.9);
+      }
+    },
+    over: tt => { badge(t, TIME[k], T.home + k * 3.3, T.home + k * 3.3 + 3.3, 540, 470); bubble2(760, 760, MSG[k], tt, T.home + k * 3.3 + 0.6, T.home + k * 3.3 + 3.2, 620, 980, 56); },
+  }));
+}
+// ---------- 5. 23:30, the bar is closed
+function sClosed(t) {
+  const lt = t - T.closed;
+  if (lt >= 4.0 && lt < 6.4) { // the message
+    setCam({ x: 540, y: 1060, z: 1.0 });
+    compose(t, OPT({ bg: () => { ctx.fillStyle = '#2A3550'; ctx.fillRect(-300, -300, W + 600, H + 600); }, dof: 0, rim: false, shadow: 0.2,
+      ch: tt => chatScreen(540, 1100, 1.0, 'Viernes de bar', [
+        { me: true, text: '¡Ya estoy en el bar!', time: '23:30' },
+        { who: 'Laura', text: 'Nos fuimos hace\nuna hora', time: '23:31', a: prog(t, T.closed + 4.4, T.closed + 4.8) },
+        { who: 'Javi', whoCol: '#2F8FD6', text: 'Tranqui, Paco…\nestamos llegando', time: '23:31', a: prog(t, T.closed + 5.2, T.closed + 5.6) },
+      ], { ini: 'V', sub: 'Laura, Javi, Dani, tú' }) }));
+    return;
+  }
+  const after = lt >= 6.4;
+  setCam(after ? camLerp({ x: 540, y: 1150, z: 1.05 }, { x: 600, y: 1080, z: 1.3 }, seg(lt, 6.4, 9.5)) : { x: 540, y: 1160, z: 1.02 });
+  compose(t, OPT({
+    bg: () => { barBG(1, 23, 30); doorSign(830, 900, 'CERRADO'); },
+    ch: tt => {
+      barTable(330, 1420, 560); chairUp(200, 1420, 0.9); chairUp(440, 1420, 0.9);
+      // waiter mopping
+      const ox = 260 + wv(tt, 1.5, 40);
+      person({ who: 'senor', outfit: 'camarero', x: ox, y: 1760, s: 0.75, t: tt, handL: [40, -470], handR: [110, -330], poseL: 'grab', poseR: 'grab', holdR: (hx, hy) => mop(hx, hy + 260, 0.25 + wv(tt, 3, 0.25)), face: { mouth: 'flat', eyes: 'half', look: [1, 0.3] } });
+      // Paco runs in, panting
+      const run = prog(lt, 0, 1.2), x = lerp(1400, 760, easeOut(run)), wc = walkCycle(tt, 18, 44);
+      const o = { outfit: 'pacoCalle', x, y: 1760 - (run < 1 ? wc.bob : 0), s: 0.88, t: tt, footL: run < 1 ? wc.footL : undefined, footR: run < 1 ? wc.footR : undefined, chest: run >= 1 ? Math.max(0, Math.sin(tt * 8)) : 0 };
+      if (!after) Object.assign(o, { handL: run < 1 ? [-200, -420] : [-250, -760], handR: run < 1 ? [200, -420] : [250, -760], poseL: 'open', poseR: 'open', lean: run < 1 ? -0.15 : 0,
+        face: { mouth: run < 1 ? 'open' : 'grin', eyes: run < 1 ? 'wide' : 'happy', sweat: tt * 3, look: [-1, 0] } });
+      else Object.assign(o, { handR: [120, -620], poseR: 'grab', holdR: (hx, hy) => phone(hx, hy - 50, 0.9, '23:31', -0.1), handL: [-170, -320],
+        face: { mouth: 'wobble', eyes: 'open', look: [0.3, -0.5], sweat: tt * 2, gloom: seg(lt, 6.6, 7.4), t: tt } });
+      paco(o);
+    },
+    over: tt => {
+      bubble2(760, 760, '¡Ya estoy!', tt, T.closed + 1.3, T.closed + 3.0, 760, 980, 64);
+      if (lt > 3.0 && lt < 4.0) alertMarks(860, 900, 0.7, -0.6, tt, T.closed + 3.0);
+      if (!after && lt > 3.0) { ctx.save(); ctx.globalAlpha = 0.7; qmarks(tt, 760, 820, 3); ctx.restore(); }
+    },
+    grade: BAR,
+  }));
+}
+</script></body></html>
