@@ -14,6 +14,8 @@ Esta tarea se ejecuta cada día a las 10:17 (Europe/Madrid) en una sesión nueva
 ## Qué hacer en cada ejecución
 Hoy = fecha actual en Madrid.
 
+0. Comprueba que tienes las herramientas de Metricool (mcp__Metricool_Social_Media_Management__*, búscalas con ToolSearch) haciendo un getScheduledPosts de los próximos 3 días. Si no están, termina con: "FALLO: la tarea de reels no tiene acceso a Metricool. Revisa los conectores del proyecto."
+
 1. Si no existe `/home/user/paco-reels`, adjunta el repo `Cosas-de-Paco/paco-reels` (add_repo) y clónalo. Haz `git pull`.
 2. Comprobar publicación de hoy: si en `calendario.json` hay un reel con fecha de hoy y estado `programado`, consulta Metricool (getScheduledPosts de hoy; si ya no aparece como pendiente, se ha publicado). Marca el estado `publicado` (o `fallo` si sigue pendiente con error) y apúntalo para la notificación final.
 3. Producir: si hoy es exactamente 2 días antes de la siguiente fecha `libre` de `calendario.json`, crea el reel para esa fecha:
