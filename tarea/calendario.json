@@ -1,0 +1,26 @@
+{
+  "nota": "Fechas de publicacion 10:00 Europe/Madrid. estado: libre | programado | publicado | fallo | reservado. Al acabarse la lista, anadir fechas cada 2 dias desde la ultima.",
+  "reels": [
+    {"fecha": "2026-11-20", "numero": 20, "slug": "guerra-termostato", "tema": "La guerra del termostato", "estado": "programado"},
+    {"fecha": "2026-11-22", "numero": 21, "slug": "estoy-llegando", "tema": "Estoy llegando", "estado": "programado"},
+    {"fecha": "2026-11-24", "numero": 22, "slug": "aparcamiento", "tema": "Aparcamiento imposible", "estado": "programado"},
+    {"fecha": "2026-11-26", "numero": 23, "slug": "black-friday", "tema": "Black Friday", "estado": "programado"},
+    {"fecha": "2026-11-28", "estado": "libre"},
+    {"fecha": "2026-12-01", "tema": "Calendario de Adviento (no lo hace la tarea)", "estado": "reservado"},
+    {"fecha": "2026-12-03", "estado": "libre"},
+    {"fecha": "2026-12-05", "estado": "libre"},
+    {"fecha": "2026-12-07", "estado": "libre"},
+    {"fecha": "2026-12-09", "estado": "libre"},
+    {"fecha": "2026-12-11", "estado": "libre"},
+    {"fecha": "2026-12-13", "estado": "libre"},
+    {"fecha": "2026-12-15", "estado": "libre"},
+    {"fecha": "2026-12-17", "estado": "libre"},
+    {"fecha": "2026-12-19", "estado": "libre"},
+    {"fecha": "2026-12-21", "estado": "libre"},
+    {"fecha": "2026-12-23", "estado": "libre"},
+    {"fecha": "2026-12-25", "estado": "libre"},
+    {"fecha": "2026-12-27", "estado": "libre"},
+    {"fecha": "2026-12-29", "estado": "libre"},
+    {"fecha": "2026-12-31", "estado": "libre"}
+  ]
+}
