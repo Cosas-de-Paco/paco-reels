@@ -1,7 +1,7 @@
 {
   "nota": "Fechas de publicacion 10:00 Europe/Madrid. estado: libre | programado | publicado | fallo | reservado. Al acabarse la lista, anadir fechas cada 2 dias desde la ultima.",
   "reels": [
-    {"fecha": "2026-11-20", "numero": 20, "slug": "guerra-termostato", "tema": "La guerra del termostato", "estado": "programado"},
+    {"fecha": "2026-11-20", "numero": 20, "slug": "guerra-termostato", "tema": "La guerra del termostato", "estado": "publicado"},
     {"fecha": "2026-11-22", "numero": 21, "slug": "estoy-llegando", "tema": "Estoy llegando", "estado": "programado"},
     {"fecha": "2026-11-24", "numero": 22, "slug": "aparcamiento", "tema": "Aparcamiento imposible", "estado": "programado"},
     {"fecha": "2026-11-26", "numero": 23, "slug": "black-friday", "tema": "Black Friday", "estado": "programado"},
