@@ -1,0 +1,77 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>@font-face{font-family:"Fredoka";src:url("Fredoka.ttf")}html,body{margin:0;padding:0;background:#000}canvas{display:block}</style>
+</head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="common.js"></script><script src="hd.js"></script><script src="fx.js"></script><script src="body2.js"></script><script src="cel.js"></script><script src="props14.js"></script><script src="lib.js"></script><script src="arms.js"></script><script src="anim.js"></script><script src="p20.js"></script>
+<script>
+// Reel 24 (intro): La llamada de mamá
+const T = { ring: 1.5, cu: 3.4, end: 7.0 };
+const EVE = { top: '#9FB0FF', bot: '#3A2E7A', a: 0.3 };
+const OPT = o => Object.assign({ dof: 3, grade: EVE, rim: { col: '#BFE0FF', a: 0.55 }, bloom: 0.22, vig: 0.38 }, o);
+const PAC = { skin: SK, sleeve: '#2E8B7A' };
+
+function remote(x, y, s, rot = 0) { ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(s, s); roundRect(-28, -95, 56, 190, 18); fillLine(lgrad(-28, 28, '#2A2A36'), 5);
+  ell(0, -60, 13, 13); ctx.fillStyle = '#E8473A'; ctx.fill(); for (let i = 0; i < 3; i++) for (let j = 0; j < 2; j++) { ell(-12 + j * 24, -15 + i * 30, 8, 8); ctx.fillStyle = '#8A8FA0'; ctx.fill(); } ctx.restore(); }
+// phone; ring: 0..1 shake amount
+function callPhone(x, y, s, t, ring = 1, o = {}) { ctx.save(); const sh = ring * Math.sin(t * 70) * 0.07; ctx.translate(x, y); ctx.rotate((o.rot || 0) + sh); ctx.scale(s, s);
+  roundRect(-150, -300, 300, 600, 44); fillLine('#1C1C26', 8);
+  const g = ctx.createLinearGradient(0, -270, 0, 270); g.addColorStop(0, '#5A3FB8'); g.addColorStop(1, '#E8798F'); roundRect(-130, -278, 260, 556, 30); ctx.fillStyle = g; ctx.fill();
+  if (o.off) { roundRect(-130, -278, 260, 556, 30); ctx.fillStyle = '#14141C'; ctx.fill(); ctx.restore(); return; }
+  lab('Llamada entrante', 0, -200, 26, 'rgba(255,255,255,0.85)');
+  ell(0, -90, 66, 66); fillLine('#F1C4A2', 5); ctx.beginPath(); ctx.arc(0, -112, 60, Math.PI * 1.05, Math.PI * 1.95); ctx.lineWidth = 26; ctx.strokeStyle = '#B5452F'; ctx.stroke(); lab('♥', 0, -78, 40, '#E8473A');
+  lab('MAMÁ', 0, 30, 70, '#FFFFFF');
+  for (const [bx, col, sym] of [[-70, '#E8473A', '✕'], [70, '#3CC45A', '✓']]) { const p = 1 + (bx > 0 ? 0.08 * Math.max(0, Math.sin(t * 8)) : 0); ell(bx, 190, 44 * p, 44 * p); fillLine(col, 5); lab(sym, bx, 192, 46, '#FFFFFF'); }
+  ctx.restore();
+  if (ring > 0.2) { ctx.save(); ctx.globalAlpha = 0.8; motionArcs(x - 190 * s, y - 120 * s, 70 * s, 2.5, 3.8, 0.8); motionArcs(x + 190 * s, y - 120 * s, 70 * s, -0.7, 0.6, 0.8); ctx.restore(); }
+}
+
+window.draw = function (t) {
+  if (t < T.cu) sSofa(t); else sPhone(t);
+  ctx = MAINCTX; ctx.setTransform(1, 0, 0, 1, 0, 0);
+  caption2('Viernes noche.\nSofá y *serie* *nueva*', t, -1.5, 1.9);
+  caption2('Llama *MAMÁ*', t, 2.0, 3.3);
+  caption2('Si no lo coges…', t, 3.6, 5.0);
+  caption2('…en 5 minutos llama\na *tu* *tía* y *al* *portero*', t, 5.1, 7.0);
+  grain(t, 0.045);
+  whip(t, T.cu);
+};
+function sSofa(t) {
+  const lt = t, shock = lt > T.ring + 0.25;
+  setCam(lt < T.ring ? { x: 540, y: 1140, z: 1.0 } : camLerp({ x: 540, y: 1140, z: 1.0 }, { x: 600, y: 1100, z: 1.22 }, seg(lt, T.ring, T.ring + 0.5)));
+  const ring = lt > T.ring ? 1 : 0;
+  compose(t, OPT({
+    bg: () => { livingBG(0); },
+    ch: tt => {
+      sofa(500, 1690, 0.95, '#C0564A');
+      popcorn(250, 1500, 0.9);
+      const o = { outfit: 'pacoCasa', x: 480, y: 1650, s: 0.82, t: tt, footL: [-120, -60], footR: [80, -60] };
+      const click = lt > 0.8 && lt < 1.1;
+      if (!shock) Object.assign(o, { handR: [190, click ? -400 : -360], poseR: 'grab', holdR: (hx, hy) => remote(hx + 4, hy - 30, 0.75, -0.5), handL: [-200, -330], face: { mouth: 'smile', eyes: lt > 0.4 ? 'happy' : 'open', look: [0.3, -0.2], t: tt } });
+      else Object.assign(o, { handR: [230, -470], poseR: 'open', handL: [-220, -470], poseL: 'open', face: { mouth: 'scream', eyes: 'wide', look: [1, 0.3], t: tt } });
+      paco(o);
+      if (shock) remote(640, 1560, 0.75, 1.2);
+      callPhone(880, 1420, 0.36, tt, ring, { rot: -0.15, off: !ring });
+    },
+    over: tt => {
+      if (lt > 0.85 && lt < 1.4) boom('¡CLIC!', 820, 900, 70, '#FFFFFF', '#5B7FD0', t, 0.85, 0.08, 0.5);
+      if (lt > T.ring) { boom('¡BZZZ!', 820, 1150, 95, '#FFFFFF', '#E8473A', t, T.ring, -0.1, 1.6); if (shock) shockBurst(470, 1000, 260, tt, '#FFE14D', 0.18); }
+    },
+    light: [{ x: 1000, y: 900, r: 700, col: 'rgba(140,200,255,A)', a: 0.35 }],
+  }));
+}
+function sPhone(t) {
+  const lt = t - T.cu;
+  setCam({ x: 540, y: 1000, z: 1.0 + lt * 0.02 });
+  compose(t, OPT({
+    bg: () => { ctx.fillStyle = '#C0564A'; ctx.fillRect(-300, -300, W + 600, H + 600); halftone(-300, 0, W + 600, H, 'rgba(0,0,0,0.1)', 30); },
+    dof: 0,
+    ch: tt => {
+      callPhone(540, 1080, 1.35, tt, 1);
+      // thumb hovering between the two buttons
+      const hx = 540 + Math.sin(tt * 5) * 95, hy = 1080 + 190 * 1.35 + 60 + (lt > 1.6 ? Math.sin(tt * 3) * 15 : 0);
+      hdArm([900, 2100], [hx + 30, hy], 1, { k: 2.4, sleeve: PAC.sleeve, skin: PAC.skin, pose: 'point', side: 1, cuff: true });
+    },
+  }));
+}
+</script></body></html>

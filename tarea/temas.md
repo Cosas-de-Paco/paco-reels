@@ -12,7 +12,7 @@
 - El abrigo y el frío de la mañana
 - Atasco de compras navideñas en el centro comercial
 - La última croqueta, versión turrón: queda un trozo de turrón y nadie lo coge
-- La madre que llama justo cuando te pones a ver algo
+- ~~La madre que llama justo cuando te pones a ver algo~~ (reservado para el 28 nov, intro aprobada)
 - El grupo de WhatsApp de padres del cole / del trabajo y el «¿quién trae qué?»
 - El jefe que manda un correo el viernes a las 17:59
 - La pareja y el mando de la tele (qué vemos esta noche)
