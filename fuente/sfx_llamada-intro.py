@@ -1,0 +1,8 @@
+import sys; sys.argv=['x','7']; exec(open('sfx_saga.py').read())
+bouncy(0.0,1.5,0.14,0,0.24)
+add(thud(0.04,1800),0.85,0.35)
+for k in np.arange(1.5,7.0,0.9): buzz(k,0.45,0.32)
+add(chirp(500,1500,0.35),1.75,0.25); add(thud(0.3,90),1.8,0.45)
+add(swoosh(0.25),3.3,0.3)
+suspense(3.5,7.0,0.14)
+save('audio.wav')
