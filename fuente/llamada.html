@@ -1,0 +1,247 @@
+<!doctype html>
+<html><head><meta charset="utf-8">
+<style>@font-face{font-family:"Fredoka";src:url("Fredoka.ttf")}html,body{margin:0;padding:0;background:#000}canvas{display:block}</style>
+</head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="common.js"></script><script src="hd.js"></script><script src="fx.js"></script><script src="body2.js"></script><script src="cel.js"></script><script src="props14.js"></script><script src="lib.js"></script><script src="arms.js"></script><script src="anim.js"></script><script src="p20.js"></script>
+<script>
+// Reel 24: La llamada de mamá (intro 0-7 s aprobada, sin tocar)
+const T = { ring: 1.5, cu: 3.4, end: 7.0 };
+const T2 = { call: 7.7, hour: 12.4, bye: 19.0, spoil: 24.6, cu: 27.0, again: 31.0, pick: 33.9, end: 38.0 };
+const EVE = { top: '#9FB0FF', bot: '#3A2E7A', a: 0.3 };
+const OPT = o => Object.assign({ dof: 3, grade: EVE, rim: { col: '#BFE0FF', a: 0.55 }, bloom: 0.22, vig: 0.38 }, o);
+const PAC = { skin: SK, sleeve: '#2E8B7A' };
+
+function remote(x, y, s, rot = 0) { ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(s, s); roundRect(-28, -95, 56, 190, 18); fillLine(lgrad(-28, 28, '#2A2A36'), 5);
+  ell(0, -60, 13, 13); ctx.fillStyle = '#E8473A'; ctx.fill(); for (let i = 0; i < 3; i++) for (let j = 0; j < 2; j++) { ell(-12 + j * 24, -15 + i * 30, 8, 8); ctx.fillStyle = '#8A8FA0'; ctx.fill(); } ctx.restore(); }
+// phone; ring: 0..1 shake amount
+function callPhone(x, y, s, t, ring = 1, o = {}) { ctx.save(); const sh = ring * Math.sin(t * 70) * 0.07; ctx.translate(x, y); ctx.rotate((o.rot || 0) + sh); ctx.scale(s, s);
+  roundRect(-150, -300, 300, 600, 44); fillLine('#1C1C26', 8);
+  const g = ctx.createLinearGradient(0, -270, 0, 270); g.addColorStop(0, '#5A3FB8'); g.addColorStop(1, '#E8798F'); roundRect(-130, -278, 260, 556, 30); ctx.fillStyle = g; ctx.fill();
+  if (o.off) { roundRect(-130, -278, 260, 556, 30); ctx.fillStyle = '#14141C'; ctx.fill(); ctx.restore(); return; }
+  lab('Llamada entrante', 0, -200, 26, 'rgba(255,255,255,0.85)');
+  ell(0, -90, 66, 66); fillLine('#F1C4A2', 5); ctx.beginPath(); ctx.arc(0, -112, 60, Math.PI * 1.05, Math.PI * 1.95); ctx.lineWidth = 26; ctx.strokeStyle = '#B5452F'; ctx.stroke(); lab('♥', 0, -78, 40, '#E8473A');
+  lab('MAMÁ', 0, 30, 70, '#FFFFFF');
+  for (const [bx, col, sym] of [[-70, '#E8473A', '✕'], [70, '#3CC45A', '✓']]) { const p = 1 + (bx > 0 ? 0.08 * Math.max(0, Math.sin(t * 8)) : 0); ell(bx, 190, 44 * p, 44 * p); fillLine(col, 5); lab(sym, bx, 192, 46, '#FFFFFF'); }
+  ctx.restore();
+  if (ring > 0.2) { ctx.save(); ctx.globalAlpha = 0.8; motionArcs(x - 190 * s, y - 120 * s, 70 * s, 2.5, 3.8, 0.8); motionArcs(x + 190 * s, y - 120 * s, 70 * s, -0.7, 0.6, 0.8); ctx.restore(); }
+}
+
+window.draw = function (t) {
+  if (t < T.cu) sSofa(t); else if (t < T.end) sPhone(t);
+  else if (t < T2.call) sPress(t);
+  else if (t < T2.spoil) sCall(t);
+  else if (t < T2.cu) sMama(t);
+  else if (t < T2.again) sShock(t);
+  else sAgain(t);
+  ctx = MAINCTX; ctx.setTransform(1, 0, 0, 1, 0, 0);
+  if ((t > T2.call && t < T2.spoil) || (t > T2.pick && t < T2.end + 1)) mamaPIP(t, t > T2.pick ? T2.pick : T2.call);
+  ctx = MAINCTX; ctx.setTransform(1, 0, 0, 1, 0, 0);
+  caption2('Viernes noche.\nSofá y *serie* *nueva*', t, -1.5, 1.9);
+  caption2('Llama *MAMÁ*', t, 2.0, 3.3);
+  caption2('Si no lo coges…', t, 3.6, 5.0);
+  caption2('…en 5 minutos llama\na *tu* *tía* y *al* *portero*', t, 5.1, 7.0);
+  caption2('«¿Has cenado?\n¿Vas *abrigado*?»', t, 7.8, 9.9);
+  caption2('«¿Y novia,\npara *cuándo*?»', t, 10.0, 12.3);
+  caption2('*Una* *hora* después…', t, 12.5, 15.4);
+  caption2('«…y la de la vecina,\n*embarazada*»', t, 15.5, 18.9);
+  caption2('«Bueno, te dejo,\nque estarás *liado*»', t, 19.1, 21.7);
+  caption2('«¿Qué *serie* ves?»', t, 21.8, 24.5);
+  caption2('«¡Esa! El asesino\nes *el* *portero*»', t, 24.7, 27.6);
+  caption2('Le quedaban\n*8* *temporadas*', t, 27.8, 30.9);
+  caption2('Vuelve a llamar *MAMÁ*', t, 31.2, 33.9);
+  caption2('«Se me olvidaba:\n¿has *cenado*?»', t, 34.0, 38.1);
+  grain(t, 0.045);
+  whip(t, T.cu);
+  for (const c of [T2.call, T2.hour, T2.bye, T2.spoil, T2.cu, T2.again, T2.pick]) whip(t, c);
+  if (t >= T.end) whip(t, T.end);
+};
+function sSofa(t) {
+  const lt = t, shock = lt > T.ring + 0.25;
+  setCam(lt < T.ring ? { x: 540, y: 1140, z: 1.0 } : camLerp({ x: 540, y: 1140, z: 1.0 }, { x: 600, y: 1100, z: 1.22 }, seg(lt, T.ring, T.ring + 0.5)));
+  const ring = lt > T.ring ? 1 : 0;
+  compose(t, OPT({
+    bg: () => { livingBG(0); },
+    ch: tt => {
+      sofa(500, 1690, 0.95, '#C0564A');
+      popcorn(250, 1500, 0.9);
+      const o = { outfit: 'pacoCasa', x: 480, y: 1650, s: 0.82, t: tt, footL: [-120, -60], footR: [80, -60] };
+      const click = lt > 0.8 && lt < 1.1;
+      if (!shock) Object.assign(o, { handR: [190, click ? -400 : -360], poseR: 'grab', holdR: (hx, hy) => remote(hx + 4, hy - 30, 0.75, -0.5), handL: [-200, -330], face: { mouth: 'smile', eyes: lt > 0.4 ? 'happy' : 'open', look: [0.3, -0.2], t: tt } });
+      else Object.assign(o, { handR: [230, -470], poseR: 'open', handL: [-220, -470], poseL: 'open', face: { mouth: 'scream', eyes: 'wide', look: [1, 0.3], t: tt } });
+      paco(o);
+      if (shock) remote(640, 1560, 0.75, 1.2);
+      callPhone(880, 1420, 0.36, tt, ring, { rot: -0.15, off: !ring });
+    },
+    over: tt => {
+      if (lt > 0.85 && lt < 1.4) boom('¡CLIC!', 820, 900, 70, '#FFFFFF', '#5B7FD0', t, 0.85, 0.08, 0.5);
+      if (lt > T.ring) { boom('¡BZZZ!', 820, 1150, 95, '#FFFFFF', '#E8473A', t, T.ring, -0.1, 1.6); if (shock) shockBurst(470, 1000, 260, tt, '#FFE14D', 0.18); }
+    },
+    light: [{ x: 1000, y: 900, r: 700, col: 'rgba(140,200,255,A)', a: 0.35 }],
+  }));
+}
+function sPhone(t) {
+  const lt = t - T.cu;
+  setCam({ x: 540, y: 1000, z: 1.0 + lt * 0.02 });
+  compose(t, OPT({
+    bg: () => { ctx.fillStyle = '#C0564A'; ctx.fillRect(-300, -300, W + 600, H + 600); halftone(-300, 0, W + 600, H, 'rgba(0,0,0,0.1)', 30); },
+    dof: 0,
+    ch: tt => {
+      callPhone(540, 1080, 1.35, tt, 1);
+      // thumb hovering between the two buttons
+      const hx = 540 + Math.sin(tt * 5) * 95, hy = 1080 + 190 * 1.35 + 60 + (lt > 1.6 ? Math.sin(tt * 3) * 15 : 0);
+      hdArm([900, 2100], [hx + 30, hy], 1, { k: 2.4, sleeve: PAC.sleeve, skin: PAC.skin, pose: 'point', side: 1, cuff: true });
+    },
+  }));
+}
+// ---------- Reel 24: continuación desde el segundo 7
+const MAMA = { who: 'senora', outfit: 'senora' };
+const talk = t => ['open', 'smile', 'o', 'grin', 'open', 'flat'][Math.floor(t * 7) % 6];
+function earPhone() { return undefined; }
+function phoneAtEar(o, side) { const [x, y, R] = headPos(o); phone(x + side * R * 0.98, y + R * 0.12, (o.s || 1) * 0.85, '', side * 0.22); }
+function kitchenBG() { wall('#F7E3B0', 1500); ctx.save(); ctx.strokeStyle = 'rgba(160,110,60,0.18)'; ctx.lineWidth = 4;
+  for (let y = 1000; y < 1500; y += 80) { ctx.beginPath(); ctx.moveTo(-300, y); ctx.lineTo(W + 300, y); ctx.stroke(); }
+  for (let x = -300; x < W + 300; x += 80) { ctx.beginPath(); ctx.moveTo(x, 1000); ctx.lineTo(x, 1500); ctx.stroke(); } ctx.restore();
+  roundRect(120, 360, 360, 420, 10); fillLine('#BFE6FF', 10); ctx.strokeStyle = LINE; ctx.lineWidth = 10; ctx.beginPath(); ctx.moveTo(300, 360); ctx.lineTo(300, 780); ctx.stroke();
+  fridge(880, 1500, 1.0); roundRect(-300, 1500, W + 600, 600, 0); fillLine('#B5835A', 8); }
+// mamá en círculo arriba a la derecha mientras habla por teléfono
+function mamaPIP(t, t0) {
+  const p = easeOutBack(prog(t, t0 + 0.15, t0 + 0.5), 2); if (p <= 0) return;
+  const cx = 805, cy = 720, r = 215 * p;
+  ctx.save(); ell(cx, cy, r + 14, r + 14); ctx.fillStyle = '#FFFFFF'; ctx.fill(); ctx.lineWidth = 9; ctx.strokeStyle = LINE; ctx.stroke();
+  ell(cx, cy, r, r); ctx.clip();
+  ctx.translate(cx, cy); ctx.scale(p, p); ctx.translate(-cx, -cy);
+  ctx.fillStyle = '#F7E3B0'; ctx.fillRect(cx - 230, cy - 230, 460, 460); halftone(cx - 230, cy - 230, 460, 460, 'rgba(160,110,60,0.12)', 22);
+  const g = wv(t, 5, 70);
+  const mo = Object.assign({}, MAMA, { x: cx, y: cy + 470, s: 0.6, t, handL: [-150, -720], poseL: 'grab', handR: [190 + g, -540 - Math.abs(g)], poseR: 'open',
+    face: { mouth: talk(t), eyes: Math.floor(t * 1.3) % 3 === 0 ? 'happy' : 'open', look: [-0.3, 0], brow: { raise: 0.5 }, t } });
+  person(mo); phoneAtEar(mo, -1);
+  ctx.restore();
+  ctx.save(); ctx.globalAlpha = Math.min(1, p); roundRect(cx - 90, cy + r - 30, 180, 56, 24); ctx.fillStyle = '#16100F'; ctx.fill(); lab('MAMÁ', cx, cy + r - 1, 36, '#FFE14D'); ctx.restore();
+}
+// el pulgar pulsa el botón verde
+function sPress(t) {
+  const lt = t - T.end;
+  setCam({ x: 540, y: 1000, z: 1.14 });
+  compose(t, OPT({
+    bg: () => { ctx.fillStyle = '#C0564A'; ctx.fillRect(-300, -300, W + 600, H + 600); halftone(-300, 0, W + 600, H, 'rgba(0,0,0,0.1)', 30); },
+    dof: 0,
+    ch: tt => {
+      callPhone(540, 1080, 1.35, tt, lt < 0.25 ? 1 : 0);
+      const p = seg(lt, 0, 0.22), bx = 540 + 70 * 1.35, by = 1080 + 190 * 1.35;
+      hdArm([900, 2100], [lerp(560, bx + 20, p), lerp(by + 60, by + 30, p)], 1, { k: 2.4, sleeve: PAC.sleeve, skin: PAC.skin, pose: 'point', side: 1, cuff: true });
+    },
+    over: tt => { boom('¡CLIC!', 760, 1500, 90, '#FFFFFF', '#3CC45A', t, T.end + 0.2, 0.1, 0.5); },
+  }));
+}
+function wallTime(t) { const lt = t - T2.hour; return 21 * 60 + 5 + (t < T2.hour ? 0 : seg(lt, 0.3, 4.5) * 90) + (t > T2.bye ? 3 : 0); }
+function livingProps(tt, clockMin, web = 0) {
+  wallClock(230, 1000, 80, Math.floor(clockMin / 60), clockMin % 60);
+  if (web > 0) { ctx.save(); ctx.globalAlpha = web; cobweb(-10, 1240, 150); ctx.restore(); }
+}
+// Paco al teléfono en el sofá: llamada, una hora después, «te dejo»
+function sCall(t) {
+  const mode = t < T2.hour ? 'call' : t < T2.bye ? 'hour' : 'bye';
+  const lt = t - (mode === 'call' ? T2.call : mode === 'hour' ? T2.hour : T2.bye);
+  let cam = { x: 540, y: 1140, z: 1.0 };
+  if (mode === 'call') cam = camLerp({ x: 540, y: 1140, z: 1.0 }, { x: 520, y: 1110, z: 1.12 }, seg(lt, 2.0, 4.0));
+  if (mode === 'hour') cam = camLerp({ x: 540, y: 1180, z: 0.98 }, { x: 520, y: 1160, z: 1.05 }, seg(lt, 0, 6));
+  if (mode === 'bye') cam = camLerp({ x: 540, y: 1140, z: 1.0 }, { x: 500, y: 1080, z: 1.2 }, seg(lt, 0.5, 2.5));
+  setCam(cam);
+  const o = { outfit: 'pacoCasa', x: 480, y: 1650, s: 0.82, footL: [-120, -60], footR: [80, -60] };
+  compose(t, OPT({
+    bg: () => { livingBG(0); },
+    ch: tt => {
+      livingProps(tt, wallTime(t), mode === 'hour' ? seg(lt, 3.0, 5.0) : 0);
+      sofa(500, 1690, 0.95, '#C0564A');
+      if (mode === 'call') popcorn(250, 1500, 0.9);
+      else { ctx.save(); ctx.translate(250, 1500); ctx.rotate(0.5); popcorn(0, 0, 0.9); ctx.restore(); }
+      remote(640, 1560, 0.75, 1.2);
+      o.t = tt; Object.assign(o, { handR: [165, -700], poseR: 'grab', handL: [-200, -330] });
+      if (mode === 'call') { const nov = lt > 2.3;
+        o.face = nov ? { mouth: 'wobble', eyes: 'wide', look: [0.6, -0.4], brow: { raise: 1 }, sweat: tt * 2, t: tt } : { mouth: lt < 1.2 ? 'smile' : 'flat', eyes: 'open', look: [0.6, -0.4], t: tt }; }
+      if (mode === 'hour') Object.assign(o, { y: 1700, lean: -0.14 * seg(lt, 0, 1.5), face: { mouth: 'flat', eyes: 'half', look: [0.5, 0.2], gloom: seg(lt, 1, 3) * 0.8, t: tt } });
+      if (mode === 'bye') { const ask = lt > 2.8;
+        Object.assign(o, { lean: 0, handL: ask ? [-200, -330] : [-230 + wv(tt, 12, 20), -560], poseL: ask ? 'open' : 'fist',
+          face: ask ? { mouth: 'smile', eyes: 'open', look: [0.6, -0.4], t: tt } : { mouth: 'grin', eyes: 'happy', look: [0.6, -0.4], t: tt } }); }
+      paco(o); phoneAtEar(o, 1);
+      if (mode === 'hour') eyeBags(o, 0.3 + seg(lt, 0, 4) * 0.7);
+      if (mode === 'bye' && lt > 0.8 && lt < 2.8) starEyes(o, tt);
+    },
+    over: tt => {
+      if (mode === 'hour' && lt > 4.6) zzz(tt, 300, 900);
+      if (mode === 'bye') bubble2(330, 760, 'La del asesino\ndel ático', tt, T2.bye + 3.5, T2.spoil, 440, 960, 50);
+    },
+    light: [{ x: 1000, y: 900, r: 700, col: 'rgba(140,200,255,A)', a: 0.35 }],
+  }));
+}
+// mamá a pantalla completa: el spoiler
+function sMama(t) {
+  const lt = t - T2.spoil;
+  setCam(camLerp({ x: 540, y: 1060, z: 1.0 }, { x: 540, y: 980, z: 1.25 }, seg(lt, 0.2, 2.2)));
+  compose(t, OPT({
+    bg: () => kitchenBG(), grade: { top: '#FFE0B0', bot: '#C06A5A', a: 0.2 }, rim: { col: '#FFE6B5', a: 0.5 },
+    ch: tt => {
+      const g = wv(tt, 6, 50);
+      const mo = Object.assign({}, MAMA, { x: 520, y: 1800, s: 1.0, t: tt, handL: [-150, -700], poseL: 'grab', handR: [220, -640 + g], poseR: 'point',
+        face: { mouth: lt > 1.4 ? 'grin' : talk(tt), eyes: lt > 1.4 ? 'happy' : 'open', look: [-0.2, -0.1], brow: { raise: 0.8 }, t: tt } });
+      person(mo); phoneAtEar(mo, -1);
+    },
+    over: tt => { if (lt > 1.2) { ctx.save(); ctx.globalAlpha = 0.9; heartsPop(700, 820, tt, T2.spoil + 1.2); ctx.restore(); } },
+  }));
+}
+// primer plano de Paco: grito
+function sShock(t) {
+  const lt = t - T2.cu;
+  setCam(camLerp({ x: 480, y: 1000, z: 1.9 }, { x: 480, y: 1060, z: 1.6 }, seg(lt, 1.5, 3.5)));
+  if (lt < 1.2) shakeCam(t, 12 * (1 - lt / 1.2));
+  const o = { outfit: 'pacoCasa', x: 480, y: 1650, s: 0.82, footL: [-120, -60], footR: [80, -60] };
+  compose(t, OPT({
+    bg: () => { livingBG(0); }, dof: 2,
+    ch: tt => {
+      livingProps(tt, wallTime(t));
+      sofa(500, 1690, 0.95, '#C0564A');
+      const after = lt > 1.6; o.t = tt;
+      const q = seg(lt, 1.5, 1.9);
+      if (!after) Object.assign(o, { handR: [240, -900 + q * 540], poseR: 'open', handL: [-240, -900 + q * 540], poseL: 'open', face: { mouth: 'scream', eyes: 'wide', look: [0, 0], brow: { raise: 1 }, t: tt } });
+      else Object.assign(o, { handR: [lerp(240, 200, q), -900 + q * 540], handL: [lerp(-240, -200, q), -900 + q * 540], lean: wv(tt, 2, 0.02), face: { mouth: 'wobble', eyes: 'teary', look: [0, 0.2], gloom: seg(lt, 1.6, 2.4), tears: tt, t: tt } });
+      paco(o);
+      phone(780 + lt * 40, 1200 + Math.min(lt, 0.6) * 500, 0.75, '', 1.5 + lt * 4);
+      for (let i = 0; i < 14; i++) { const a = hash(i) * Math.PI - Math.PI, v = 500 + hash(i + 5) * 600, k = Math.min(lt, 1.4);
+        const px = 300 + Math.cos(a) * v * k, py = 1420 + Math.sin(a) * v * k + 900 * k * k; ell(px, py, 20, 18); fillLine('#FFF6D8', 4); }
+    },
+    over: tt => {
+      if (lt < 1.6) { const [x, y] = headPos(o); shockBurst(x, y, 380, tt, '#FFE14D', 0.25); }
+      boom('¡NOOO!', 590, 800, 60, '#FFFFFF', '#E8473A', t, T2.cu + 0.05, -0.08, 1.5);
+    },
+    light: [{ x: 1000, y: 900, r: 700, col: 'rgba(140,200,255,A)', a: 0.35 }],
+  }));
+}
+// vuelve a sonar: bucle con el principio
+function sAgain(t) {
+  const lt = t - T2.again, pick = t > T2.pick;
+  setCam(pick ? camLerp({ x: 540, y: 1140, z: 1.0 }, { x: 500, y: 1090, z: 1.15 }, seg(t - T2.pick, 0, 3)) : { x: 600, y: 1100, z: 1.18 });
+  const o = { outfit: 'pacoCasa', x: 480, y: 1650, s: 0.82, footL: [-120, -60], footR: [80, -60] };
+  compose(t, OPT({
+    bg: () => { livingBG(0); },
+    ch: tt => {
+      livingProps(tt, wallTime(t) + 2);
+      sofa(500, 1690, 0.95, '#C0564A');
+      ctx.save(); ctx.translate(250, 1500); ctx.rotate(0.5); popcorn(0, 0, 0.9); ctx.restore();
+      remote(640, 1560, 0.75, 1.2);
+      const ring = lt > 0.3 && !pick; o.t = tt;
+      if (lt < 0.3) Object.assign(o, { handR: [200, -360], handL: [-200, -360], face: { mouth: 'wobble', eyes: 'teary', gloom: 1, t: tt } });
+      else if (!pick) Object.assign(o, { handR: [230, -470], poseR: 'open', handL: [-220, -470], poseL: 'open', face: { mouth: 'scream', eyes: 'wide', look: [1, 0.3], t: tt } });
+      else Object.assign(o, { handR: [165, -700], poseR: 'grab', handL: [-200, -330], face: { mouth: 'flat', eyes: 'half', look: [0.6, -0.3], gloom: 1, t: tt } });
+      paco(o); if (pick) phoneAtEar(o, 1);
+      if (!pick) callPhone(880, 1420, 0.36, tt, ring ? 1 : 0, { rot: -0.15, off: !ring });
+      eyeBags(o, 0.8);
+    },
+    over: tt => {
+      if (lt > 0.3 && !pick) { boom('¡BZZZ!', 820, 1150, 95, '#FFFFFF', '#E8473A', t, T2.again + 0.3, -0.1, 2.4); const [x, y] = headPos(o); shockBurst(x, y, 260, tt, '#FFE14D', 0.18); }
+    },
+    light: [{ x: 1000, y: 900, r: 700, col: 'rgba(140,200,255,A)', a: 0.35 }],
+  }));
+}
+
+</script></body></html>

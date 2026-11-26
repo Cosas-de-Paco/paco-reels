@@ -86,3 +86,5 @@ Cada vez que la tarea produzca un reel, antes de elegir tema saca en Metricool (
 
 | Reel | Fecha | Vistas | Pasan 3 s | Ver medio | Compartidos | Nota |
 |---|---|---|---|---|---|---|
+| 20 La guerra del termostato (antes de la guía) | 2026-11-20 | 504 | 57 % | 19,3 s | 0 | Datos del 26 nov |
+| 21 Estoy llegando (antes de la guía) | 2026-11-22 | 525 | 53 % | 17,1 s | 3 | Datos del 26 nov |
