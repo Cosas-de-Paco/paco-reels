@@ -5,7 +5,7 @@
     {"fecha": "2026-11-22", "numero": 21, "slug": "estoy-llegando", "tema": "Estoy llegando", "estado": "publicado"},
     {"fecha": "2026-11-24", "numero": 22, "slug": "aparcamiento", "tema": "Aparcamiento imposible", "estado": "publicado"},
     {"fecha": "2026-11-26", "numero": 23, "slug": "black-friday", "tema": "Black Friday", "estado": "publicado"},
-    {"fecha": "2026-11-28", "numero": 24, "slug": "llamada-mama", "tema": "La llamada de mamá", "portada_ms": 28400, "estado": "programado"},
+    {"fecha": "2026-11-28", "numero": 24, "slug": "llamada-mama", "tema": "La llamada de mamá", "portada_ms": 28400, "estado": "publicado"},
     {"fecha": "2026-12-01", "tema": "Calendario de Adviento (no lo hace la tarea)", "estado": "reservado"},
     {"fecha": "2026-12-03", "estado": "libre"},
     {"fecha": "2026-12-05", "estado": "libre"},
